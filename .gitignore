@@ -1,0 +1,12 @@
+# Laravel
+isi_recrutement/.env
+isi_recrutement/vendor/
+isi_recrutement/storage/logs/
+isi_recrutement/storage/framework/cache/
+isi_recrutement/storage/framework/sessions/
+isi_recrutement/storage/framework/views/
+
+# Angular
+app_front/node_modules/
+app_front/.angular/
+app_front/dist/
