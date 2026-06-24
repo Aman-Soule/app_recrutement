@@ -2,17 +2,27 @@
 
 @section('title', 'Dashboard Recruteur')
 @section('search_placeholder', 'Rechercher des candidats, offres ou rapports...')
-@section('user_name', 'Sarah Jenkins')
-@section('user_role', 'Senior Recruiter')
 
 @section('sidebar_nav')
-    <a href="{{ route('recruteur.dashboard') }}" class="nav-item active">📊 Tableau de bord</a>
-    <a href="{{ route('recruteur.offres') }}" class="nav-item">💼 Offres d'emploi</a>
-    <a href="{{ route('recruteur.candidats') }}" class="nav-item">👥 Candidats</a>
-    <a href="{{ route('recruteur.entretiens') }}" class="nav-item">📅 Entretiens</a>
+    <a href="{{ route('recruteur.dashboard') }}" class="nav-item active">
+        <x-icon name="dashboard" class="w-4 h-4" /> Tableau de bord
+    </a>
+    <a href="{{ route('recruteur.offres') }}" class="nav-item">
+        <x-icon name="briefcase" class="w-4 h-4" /> Offres d'emploi
+    </a>
+    <a href="{{ route('recruteur.candidats') }}" class="nav-item">
+        <x-icon name="users" class="w-4 h-4" /> Candidats
+    </a>
+    <a href="{{ route('recruteur.entretiens') }}" class="nav-item">
+        <x-icon name="calendar" class="w-4 h-4" /> Entretiens
+    </a>
     <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest px-3 mt-4 mb-2">APERÇUS</p>
-    <a href="#" class="nav-item">📈 Analyses</a>
-    <a href="{{ route('recruteur.parametres') }}" class="nav-item">⚙️ Paramètres</a>
+    <a href="#" class="nav-item">
+        <x-icon name="chart-bar" class="w-4 h-4" /> Analyses
+    </a>
+    <a href="{{ route('recruteur.parametres') }}" class="nav-item">
+        <x-icon name="cog" class="w-4 h-4" /> Paramètres
+    </a>
 @endsection
 
 @section('content')
@@ -21,7 +31,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Tableau de bord Recruteur</h1>
-            <p class="text-gray-400 text-sm">Bonjour Sarah. Voici l'activité du jour.</p>
+            <p class="text-gray-400 text-sm">Bonjour {{ Auth::user()->name }}. Voici l'activité du jour.</p>
         </div>
         <a href="{{ route('recruteur.offres') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-2">
             + Nouvelle offre
@@ -31,14 +41,16 @@
     {{-- Stats --}}
     <div class="grid grid-cols-4 gap-4 mb-6">
         @foreach([
-            ['label' => 'Offres actives',          'valeur' => $stats['offres_actives'],         'trend' => '▲ 8%',  'color' => 'text-green-500', 'icon' => '💼'],
-            ['label' => 'Nouvelles candidatures',   'valeur' => $stats['nouvelles_candidatures'],  'trend' => '▲ 12',  'color' => 'text-green-500', 'icon' => '📄'],
-            ['label' => 'Entretiens aujourd\'hui',  'valeur' => $stats['entretiens_aujourdhui'],   'trend' => '',       'color' => '',               'icon' => '📅'],
-            ['label' => 'Offres envoyées',          'valeur' => $stats['offres_envoyees'],         'trend' => '▼ 2%',  'color' => 'text-red-500',   'icon' => '📨'],
+            ['label' => 'Offres actives',          'valeur' => $stats['offres_actives'],         'trend' => '▲ 8%',  'color' => 'text-green-500', 'icon' => 'briefcase'],
+            ['label' => 'Nouvelles candidatures',   'valeur' => $stats['nouvelles_candidatures'],  'trend' => '▲ 12',  'color' => 'text-green-500', 'icon' => 'document'],
+            ['label' => 'Entretiens aujourd\'hui',  'valeur' => $stats['entretiens_aujourdhui'],   'trend' => '',       'color' => '',               'icon' => 'calendar'],
+            ['label' => 'Offres envoyées',          'valeur' => $stats['offres_envoyees'],         'trend' => '▼ 2%',  'color' => 'text-red-500',   'icon' => 'mail'],
         ] as $stat)
             <div class="bg-white rounded-2xl border border-gray-100 p-4">
                 <div class="flex items-center gap-3">
-                    <span class="text-2xl">{{ $stat['icon'] }}</span>
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                        <x-icon name="{{ $stat['icon'] }}" class="w-5 h-5" />
+                    </div>
                     <div>
                         <p class="text-xs text-gray-400">{{ $stat['label'] }}</p>
                         <p class="text-2xl font-bold text-gray-900">{{ $stat['valeur'] }}</p>
@@ -116,9 +128,7 @@
                         <td class="py-3">
                             <div class="flex items-center gap-2">
                                 <img src="https://i.pravatar.cc/32?u={{ $c->candidat->utilisateur->email ?? '' }}" class="w-8 h-8 rounded-full">
-                                <div>
-                                    <p class="font-medium text-gray-900 text-sm">{{ $c->candidat->utilisateur->name ?? 'N/A' }}</p>
-                                </div>
+                                <p class="font-medium text-gray-900 text-sm">{{ $c->candidat->utilisateur->name ?? 'N/A' }}</p>
                             </div>
                         </td>
                         <td class="py-3 text-gray-600 text-xs">{{ $c->offre->titre ?? 'N/A' }}</td>
@@ -200,7 +210,6 @@
         <div class="col-span-2 bg-white rounded-2xl border border-gray-100 p-5">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="font-bold text-gray-900">Temps de recrutement</h2>
-                <button class="text-gray-400 hover:text-gray-600">↺</button>
             </div>
             <svg viewBox="0 0 300 100" class="w-full" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0,20 C50,18 100,30 150,50 C200,70 250,80 300,90"

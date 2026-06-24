@@ -14,9 +14,7 @@
     <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-500 to-blue-700 flex-col justify-between p-12">
         <div class="flex items-center gap-2">
             <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
+                <x-icon name="layers" class="w-5 h-5 text-white" />
             </div>
             <span class="font-bold text-white text-xl">TalentAI</span>
         </div>
@@ -61,16 +59,26 @@
                 {{-- Nom --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom complet</label>
-                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Alex Dupont"
-                           class="w-full px-4 py-2.5 border @error('name') border-red-400 @else border-gray-200 @enderror rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-gray-400">
+                            <x-icon name="user" class="w-4 h-4" />
+                        </span>
+                        <input type="text" name="name" value="{{ old('name') }}" placeholder="Alex Dupont"
+                               class="w-full pl-10 pr-4 py-2.5 border @error('name') border-red-400 @else border-gray-200 @enderror rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                    </div>
                     @error('name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 {{-- Email --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Adresse e-mail</label>
-                    <input type="email" name="email" value="{{ old('email') }}" placeholder="name@company.com"
-                           class="w-full px-4 py-2.5 border @error('email') border-red-400 @else border-gray-200 @enderror rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-gray-400">
+                            <x-icon name="mail" class="w-4 h-4" />
+                        </span>
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="name@company.com"
+                               class="w-full pl-10 pr-4 py-2.5 border @error('email') border-red-400 @else border-gray-200 @enderror rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                    </div>
                     @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -81,16 +89,20 @@
                         <label class="cursor-pointer">
                             <input type="radio" name="role" value="candidate" class="hidden peer" {{ old('role', 'candidate') === 'candidate' ? 'checked' : '' }}>
                             <div class="border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 rounded-xl p-3 text-center transition">
-                                <span class="text-2xl">🎓</span>
-                                <p class="text-sm font-semibold text-gray-700 mt-1">Candidat</p>
+                                <div class="flex justify-center mb-1">
+                                    <x-icon name="academic-cap" class="w-6 h-6 text-gray-500 peer-checked:text-blue-600" />
+                                </div>
+                                <p class="text-sm font-semibold text-gray-700">Candidat</p>
                                 <p class="text-xs text-gray-400">Je cherche un emploi</p>
                             </div>
                         </label>
                         <label class="cursor-pointer">
                             <input type="radio" name="role" value="recruiter" class="hidden peer" {{ old('role') === 'recruiter' ? 'checked' : '' }}>
                             <div class="border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 rounded-xl p-3 text-center transition">
-                                <span class="text-2xl">🏢</span>
-                                <p class="text-sm font-semibold text-gray-700 mt-1">Recruteur</p>
+                                <div class="flex justify-center mb-1">
+                                    <x-icon name="office-building" class="w-6 h-6 text-gray-500" />
+                                </div>
+                                <p class="text-sm font-semibold text-gray-700">Recruteur</p>
                                 <p class="text-xs text-gray-400">Je recrute des talents</p>
                             </div>
                         </label>
@@ -101,16 +113,26 @@
                 {{-- Mot de passe --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
-                    <input type="password" name="password" placeholder="••••••••"
-                           class="w-full px-4 py-2.5 border @error('password') border-red-400 @else border-gray-200 @enderror rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-gray-400">
+                            <x-icon name="lock-closed" class="w-4 h-4" />
+                        </span>
+                        <input type="password" name="password" placeholder="••••••••"
+                               class="w-full pl-10 pr-4 py-2.5 border @error('password') border-red-400 @else border-gray-200 @enderror rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                    </div>
                     @error('password') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 {{-- Confirmation --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Confirmer le mot de passe</label>
-                    <input type="password" name="password_confirmation" placeholder="••••••••"
-                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-gray-400">
+                            <x-icon name="lock-closed" class="w-4 h-4" />
+                        </span>
+                        <input type="password" name="password_confirmation" placeholder="••••••••"
+                               class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                    </div>
                 </div>
 
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl text-sm transition">

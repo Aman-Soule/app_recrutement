@@ -18,12 +18,6 @@
         }
     </script>
     <style>
-        .nav-active {
-            background-color: #EFF6FF;
-            color: #2563EB;
-            font-weight: 600;
-            border-right: 3px solid #2563EB;
-        }
         .nav-item {
             display: flex;
             align-items: center;
@@ -51,8 +45,6 @@
         .badge-preselection  { background:#F5F3FF; color:#7C3AED; }
         .badge-examen        { background:#FFF7ED; color:#EA580C; }
         .badge-entretien     { background:#FFF7ED; color:#EA580C; }
-        .badge-entretien-rh  { background:#FFF7ED; color:#EA580C; }
-        .badge-entretien-tech{ background:#EFF6FF; color:#2563EB; }
         .badge-offre-envoyee { background:#F0FDF4; color:#16A34A; }
         .badge-embauche      { background:#F0FDF4; color:#16A34A; }
         .badge-rejete        { background:#FEF2F2; color:#DC2626; }
@@ -86,9 +78,7 @@
         <div class="px-5 py-4 border-b border-gray-100">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                    </svg>
+                    <x-icon name="layers" class="w-4 h-4 text-white" />
                 </div>
                 <span class="font-bold text-gray-900 text-lg tracking-tight">TalentAI</span>
             </div>
@@ -96,13 +86,10 @@
 
         {{-- Navigation --}}
         <nav class="flex-1 px-3 py-4 overflow-y-auto">
-
             <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest px-3 mb-3">
                 @yield('nav_section', 'MENU PRINCIPAL')
             </p>
-
             @yield('sidebar_nav')
-
         </nav>
 
         {{-- Forfait Pro --}}
@@ -122,9 +109,9 @@
         {{-- TOPBAR --}}
         <header class="bg-white border-b border-gray-100 px-6 h-14 flex items-center justify-between sticky top-0 z-10">
             <div class="relative">
-                <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
+                <span class="absolute left-3 top-2.5 text-gray-400">
+                    <x-icon name="search" class="w-4 h-4" />
+                </span>
                 <input
                     type="text"
                     placeholder="@yield('search_placeholder', 'Rechercher...')"
@@ -132,25 +119,20 @@
                 >
             </div>
             <div class="flex items-center gap-3">
-                {{-- Notification --}}
                 <button class="relative p-2 text-gray-400 hover:text-gray-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                    </svg>
+                    <x-icon name="bell" class="w-5 h-5" />
                     <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
                 <div class="flex items-center gap-2.5">
                     <div class="text-right">
-                        <p class="text-sm font-semibold text-gray-900 leading-tight">{{ Auth::user()->name }}</p>
-                        <p class="text-xs text-gray-400">{{ Auth::user()->role }}</p>
+                        <p class="text-sm font-semibold text-gray-900 leading-tight">{{ Auth::user()->name ?? '' }}</p>
+                        <p class="text-xs text-gray-400">{{ Auth::user()->role ?? '' }}</p>
                     </div>
                     <img src="https://i.pravatar.cc/36?img=47" class="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100" alt="Avatar">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition" title="Déconnexion">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                            </svg>
+                        <button type="submit" class="text-gray-400 hover:text-red-500 transition p-1" title="Déconnexion">
+                            <x-icon name="logout" class="w-4 h-4" />
                         </button>
                     </form>
                 </div>
