@@ -1,0 +1,135 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.auth {
+  display: flex;
+  min-height: 100vh;
+}
+
+.auth__hero {
+  flex: 1;
+  background: linear-gradient(160deg, var(--primary) 0%, #1e3a8a 100%);
+  color: #fff;
+  padding: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+.auth__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 16px;
+}
+
+.auth__logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.auth__hero h1 {
+  font-size: 2.3rem;
+  font-weight: 800;
+  line-height: 1.2;
+  max-width: 480px;
+}
+
+.auth__hero p {
+  max-width: 440px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
+.auth__panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #fff;
+}
+
+.auth__form-wrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth__form-wrap h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--gray-900);
+}
+
+.auth__subtitle {
+  color: var(--gray-500);
+  margin-top: 6px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
+.role-toggle {
+  display: flex;
+  gap: 10px;
+}
+
+.role-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+}
+
+.role-option input {
+  accent-color: var(--primary);
+}
+
+.role-option.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.8rem;
+  margin: -8px 0 16px;
+}
+
+.auth__switch {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--gray-500);
+}
+
+.auth__switch a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .auth__hero {
+    display: none;
+  }
+}

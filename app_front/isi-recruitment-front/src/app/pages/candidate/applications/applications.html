@@ -1,1 +1,55 @@
-<p>applications works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Mes candidatures</h1>
+      <p>Suivez l'avancement de vos candidatures.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <p class="loading-state">Chargement...</p>
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Offre</th>
+              <th>Entreprise</th>
+              <th>Score IA</th>
+              <th>Statut</th>
+              <th>Prochain entretien</th>
+              <th>Date de candidature</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (candidature of candidatures(); track candidature.id) {
+              <tr>
+                <td>{{ candidature.offre?.titre }}</td>
+                <td>{{ candidature.offre?.entreprise?.nom }}</td>
+                <td>{{ candidature.score_matching_ia ?? '—' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="badgeClass(candidature.statut)">
+                    {{ libelles[candidature.statut] }}
+                  </span>
+                </td>
+                <td>
+                  @if (candidature.entretiens?.length) {
+                    {{ candidature.entretiens![0].planifie_le | date: 'dd/MM/yyyy HH:mm' }}
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>{{ candidature.postule_le | date: 'dd/MM/yyyy' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-state">Vous n'avez pas encore postulé.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

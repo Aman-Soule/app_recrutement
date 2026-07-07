@@ -1,1 +1,128 @@
-<p>dashboard works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Tableau de bord</h1>
+      <p>Suivez vos candidatures et découvrez de nouvelles opportunités.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="force-header">
+        <h2>Force du profil</h2>
+        <span class="force-value">{{ profil()?.force_profil ?? 0 }}%</span>
+      </div>
+      <p class="force-subtitle">Boostez votre visibilité auprès des recruteurs</p>
+      <div class="progress">
+        <div class="progress__bar" [style.width.%]="profil()?.force_profil ?? 0"></div>
+      </div>
+
+      @if (competencesVerifiees().length) {
+        <p class="section-label">Compétences clés vérifiées</p>
+        <div class="chip-row">
+          @for (competence of competencesVerifiees(); track competence.id) {
+            <span class="chip">{{ competence.nom }}</span>
+          }
+        </div>
+      }
+
+      <a routerLink="/candidate/profile" class="btn btn-outline btn-block" style="margin-top: 16px">
+        Compléter votre profil
+      </a>
+    </div>
+
+    <div class="card">
+      <h2>Statut de la candidature active</h2>
+
+      @if (candidatureActive(); as candidature) {
+        <div class="active-application">
+          <p class="active-application__title">{{ candidature.offre?.titre }}</p>
+          <p class="active-application__meta">
+            {{ candidature.offre?.entreprise?.nom }} · {{ candidature.offre?.localisation }}
+          </p>
+
+          <div class="steps">
+            @for (etape of etapes; track etape; let i = $index) {
+              <div class="step" [class.done]="i <= etapeActiveIndex()">
+                <span class="step__dot"></span>
+                <span class="step__label">{{ libelles[etape] }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>Aucune candidature en cours pour le moment.</p>
+          <a routerLink="/candidate/jobs" class="btn btn-primary" style="margin-top: 12px">
+            Trouver une offre
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="section-title">
+    <h2>Recommandé pour vous</h2>
+    <a routerLink="/candidate/jobs">Voir toutes les offres</a>
+  </div>
+
+  <div class="grid grid-4">
+    @for (offre of offresRecommandees(); track offre.id) {
+      <div class="card job-card">
+        <div class="job-card__top">
+          <span class="badge badge-success">Match {{ offre.score_matching }}%</span>
+        </div>
+        <p class="job-card__title">{{ offre.titre }}</p>
+        <p class="job-card__meta">{{ offre.entreprise?.nom }} · {{ offre.localisation }}</p>
+        <button
+          class="btn btn-primary btn-block"
+          [disabled]="postulationEnCours() === offre.id"
+          (click)="postuler(offre)"
+        >
+          {{ postulationEnCours() === offre.id ? 'Envoi...' : 'Postuler avec TalentAI' }}
+        </button>
+      </div>
+    } @empty {
+      <p class="empty-state">Aucune recommandation pour l'instant.</p>
+    }
+  </div>
+
+  <div class="grid grid-2" style="margin-top: 24px">
+    <div class="card">
+      <h2>Messages</h2>
+      <p class="messages-count">{{ messagesNonLus() }} message(s) non lu(s)</p>
+    </div>
+
+    <div class="card">
+      <h2>Employabilité</h2>
+      <p class="employability-score">{{ profil()?.score_employabilite ?? 0 }}<span>/100</span></p>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top: 24px">
+    <div class="card">
+      <h2>Force du profil</h2>
+      <div class="chart-wrap chart-wrap--doughnut">
+        <canvas
+          baseChart
+          [data]="forceProfilChartData()"
+          [options]="forceProfilChartOptions"
+          type="doughnut"
+        ></canvas>
+        <div class="chart-center-label">{{ profil()?.force_profil ?? 0 }}%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Compétences par niveau</h2>
+      <div class="chart-wrap">
+        <canvas
+          baseChart
+          [data]="competencesChartData()"
+          [options]="competencesChartOptions"
+          type="bar"
+        ></canvas>
+      </div>
+    </div>
+  </div>
+</div>

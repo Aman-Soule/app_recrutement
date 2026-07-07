@@ -1,1 +1,166 @@
-<p>profile works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Mon profil</h1>
+      <p>Complétez votre profil pour améliorer votre visibilité auprès des recruteurs.</p>
+    </div>
+  </div>
+
+  @if (successMessage()) {
+    <div class="alert alert-success">{{ successMessage() }}</div>
+  }
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      <h2>Photo et CV</h2>
+      <div class="upload-row">
+        <div class="upload-block">
+          <div class="upload-avatar">
+            @if (profil()?.avatar_url) {
+              <img [src]="profil()?.avatar_url" alt="" />
+            } @else {
+              <span>{{ currentUser()?.name?.[0] ?? '?' }}</span>
+            }
+          </div>
+          <div>
+            <label class="btn btn-outline btn-sm upload-label">
+              {{ uploadingAvatar() ? 'Envoi...' : 'Changer la photo' }}
+              <input type="file" accept="image/png,image/jpeg,image/webp" hidden (change)="surAvatarSelectionne($event)" />
+            </label>
+            <p class="upload-hint">JPG, PNG ou WEBP, 2 Mo max.</p>
+          </div>
+        </div>
+
+        <div class="upload-block">
+          <div class="upload-cv-icon">📄</div>
+          <div>
+            <label class="btn btn-outline btn-sm upload-label">
+              {{ uploadingCv() ? 'Envoi...' : (profil()?.cv_url ? 'Remplacer le CV' : 'Ajouter un CV') }}
+              <input type="file" accept=".pdf,.doc,.docx" hidden (change)="surCvSelectionne($event)" />
+            </label>
+            @if (profil()?.cv_url) {
+              <p class="upload-hint">
+                <a [href]="profil()?.cv_url" target="_blank" rel="noopener">Voir le CV actuel</a>
+              </p>
+            } @else {
+              <p class="upload-hint">PDF, DOC ou DOCX, 5 Mo max.</p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px">
+      <h2>Informations générales</h2>
+      <form [formGroup]="form" (ngSubmit)="enregistrerProfil()">
+        <div class="field-row">
+          <div class="field">
+            <label for="titre">Titre professionnel</label>
+            <input id="titre" type="text" formControlName="titre" placeholder="Ex : Développeur Full-Stack" />
+          </div>
+          <div class="field">
+            <label for="localisation">Localisation</label>
+            <input id="localisation" type="text" formControlName="localisation" placeholder="Ville, Pays" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="biographie">Biographie</label>
+          <textarea id="biographie" rows="4" formControlName="biographie"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="portfolio_url">Portfolio (URL)</label>
+            <input id="portfolio_url" type="url" formControlName="portfolio_url" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label for="linkedin_url">LinkedIn (URL)</label>
+            <input id="linkedin_url" type="url" formControlName="linkedin_url" placeholder="https://linkedin.com/in/..." />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="annees_experience">Années d'expérience</label>
+            <input id="annees_experience" type="number" min="0" formControlName="annees_experience" />
+          </div>
+          <div class="field">
+            <label for="disponibilite">Disponibilité</label>
+            <select id="disponibilite" formControlName="disponibilite">
+              <option value="disponible">Disponible</option>
+              <option value="a_lecoute">À l'écoute d'opportunités</option>
+              <option value="non_disponible">Non disponible</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="type_contrat_souhaite">Contrat souhaité</label>
+            <select id="type_contrat_souhaite" formControlName="type_contrat_souhaite">
+              <option value="">Non précisé</option>
+              <option value="temps_plein">Temps plein</option>
+              <option value="temps_partiel">Temps partiel</option>
+              <option value="freelance">Freelance</option>
+              <option value="stage">Stage</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="type_lieu_souhaite">Lieu de travail souhaité</label>
+            <select id="type_lieu_souhaite" formControlName="type_lieu_souhaite">
+              <option value="">Non précisé</option>
+              <option value="teletravail">Télétravail</option>
+              <option value="hybride">Hybride</option>
+              <option value="presentiel">Présentiel</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="card" style="margin-top: 20px">
+      <h2>Compétences</h2>
+      <p class="competences-hint">Sélectionnez vos compétences et précisez votre niveau.</p>
+
+      <div class="competences-grid">
+        @for (competence of toutesCompetences(); track competence.id) {
+          <div class="competence-row" [class.active]="estSelectionnee(competence.id)">
+            <label class="checkbox-field">
+              <input
+                type="checkbox"
+                [checked]="estSelectionnee(competence.id)"
+                (change)="toggleCompetence(competence.id)"
+              />
+              {{ competence.nom }}
+            </label>
+            @if (estSelectionnee(competence.id)) {
+              <select
+                [ngModel]="niveauDe(competence.id)"
+                (ngModelChange)="changerNiveau(competence.id, $event)"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                @for (niveau of niveaux; track niveau) {
+                  <option [value]="niveau">{{ niveau }}</option>
+                }
+              </select>
+            }
+          </div>
+        }
+      </div>
+
+      <button class="btn btn-primary" type="button" (click)="enregistrerCompetences()" [disabled]="savingCompetences()">
+        {{ savingCompetences() ? 'Enregistrement...' : 'Enregistrer les compétences' }}
+      </button>
+    </div>
+  }
+</div>

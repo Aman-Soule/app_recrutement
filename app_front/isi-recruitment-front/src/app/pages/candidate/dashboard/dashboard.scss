@@ -1,0 +1,168 @@
+.force-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.force-value {
+  font-weight: 800;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+.force-subtitle {
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  margin: 14px 0 18px;
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.active-application__title {
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-top: 8px;
+}
+
+.active-application__meta {
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.steps {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  position: relative;
+}
+
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: var(--gray-200);
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.step__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--gray-300);
+  border: 2px solid #fff;
+}
+
+.step.done .step__dot {
+  background: var(--primary);
+}
+
+.step__label {
+  font-size: 0.7rem;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+.step.done .step__label {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 28px 0 16px;
+}
+
+.section-title h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.section-title a {
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.job-card__top {
+  margin-bottom: 10px;
+}
+
+.job-card__title {
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+.job-card__meta {
+  color: var(--gray-500);
+  font-size: 0.82rem;
+  margin-bottom: 14px;
+}
+
+.messages-count,
+.employability-score {
+  margin-top: 8px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.employability-score {
+  font-size: 1.8rem;
+}
+
+.employability-score span {
+  font-size: 1rem;
+  color: var(--gray-400);
+  font-weight: 500;
+}

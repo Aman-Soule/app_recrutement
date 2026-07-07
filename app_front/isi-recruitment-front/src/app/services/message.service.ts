@@ -1,37 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-
-export interface Message {
-  id: number;
-  from: string;
-  company: string;
-  content: string;
-  time: string;
-  unread: boolean;
-}
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { API_BASE_URL } from './api';
 
 @Injectable({ providedIn: 'root' })
 export class MessageService {
-  private messages: Message[] = [
-    {
-      id: 1,
-      from: 'Sarah Jenkins',
-      company: 'Google',
-      content: 'Hi Alex, the team was impressed by your portfolio...',
-      time: '15:30',
-      unread: true
-    },
-    {
-      id: 2,
-      from: 'Mars Wilson',
-      company: 'Stripe',
-      content: 'Thanks for the assessment results. Let\'s talk...',
-      time: '14:15',
-      unread: false
-    }
-  ];
+  private http = inject(HttpClient);
 
-  getRecentMessages(): Observable<Message[]> {
-    return of(this.messages);
+  nonLus(): Observable<{ non_lus: number }> {
+    return this.http.get<{ non_lus: number }>(`${API_BASE_URL}/messages/non-lus`);
   }
 }

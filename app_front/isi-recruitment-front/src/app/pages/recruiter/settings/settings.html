@@ -1,1 +1,140 @@
-<p>settings works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Paramètres</h1>
+      <p>Gérez les informations de votre entreprise et votre profil.</p>
+    </div>
+  </div>
+
+  @if (successMessage()) {
+    <div class="alert alert-success">{{ successMessage() }}</div>
+  }
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="tabs">
+    <button [class.active]="onglet() === 'entreprise'" (click)="changerOnglet('entreprise')">
+      Entreprise
+    </button>
+    <button [class.active]="onglet() === 'profil'" (click)="changerOnglet('profil')">
+      Mon profil
+    </button>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else if (onglet() === 'entreprise') {
+    <div class="card">
+      <h2>Logo de l'entreprise</h2>
+      <div class="upload-row">
+        <div class="upload-block">
+          <div class="upload-logo">
+            @if (profil()?.entreprise?.logo_url) {
+              <img [src]="profil()?.entreprise?.logo_url" alt="" />
+            }
+          </div>
+          <div>
+            @if (profil()?.entreprise?.id) {
+              <label class="btn btn-outline btn-sm upload-label">
+                {{ uploadingLogo() ? 'Envoi...' : 'Changer le logo' }}
+                <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden (change)="surLogoSelectionne($event)" />
+              </label>
+              <p class="upload-hint">JPG, PNG, WEBP ou SVG, 2 Mo max.</p>
+            } @else {
+              <p class="upload-hint">Enregistrez d'abord votre entreprise ci-dessous pour pouvoir ajouter un logo.</p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px">
+      <h2>Profil de l'entreprise</h2>
+      <form [formGroup]="companyForm" (ngSubmit)="enregistrerEntreprise()">
+        <div class="field-row">
+          <div class="field">
+            <label for="nom">Nom de l'entreprise</label>
+            <input id="nom" type="text" formControlName="nom" />
+          </div>
+          <div class="field">
+            <label for="secteur">Secteur d'activité</label>
+            <input id="secteur" type="text" formControlName="secteur" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" rows="3" formControlName="description"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="site_web">Site web</label>
+            <input id="site_web" type="url" formControlName="site_web" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label for="taille">Taille</label>
+            <select id="taille" formControlName="taille">
+              <option value="">Non précisée</option>
+              <option value="startup">Startup</option>
+              <option value="pme">PME</option>
+              <option value="grand_groupe">Grand groupe</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="localisation">Localisation</label>
+          <input id="localisation" type="text" formControlName="localisation" />
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="savingCompany()">
+          {{ savingCompany() ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+        </button>
+      </form>
+    </div>
+  } @else {
+    <div class="card">
+      <h2>Photo de profil</h2>
+      <div class="upload-row">
+        <div class="upload-block">
+          <div class="upload-avatar">
+            @if (profil()?.avatar_url) {
+              <img [src]="profil()?.avatar_url" alt="" />
+            } @else {
+              <span>?</span>
+            }
+          </div>
+          <div>
+            <label class="btn btn-outline btn-sm upload-label">
+              {{ uploadingAvatar() ? 'Envoi...' : 'Changer la photo' }}
+              <input type="file" accept="image/png,image/jpeg,image/webp" hidden (change)="surAvatarSelectionne($event)" />
+            </label>
+            <p class="upload-hint">JPG, PNG ou WEBP, 2 Mo max.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px">
+      <h2>Mon profil recruteur</h2>
+      <form [formGroup]="profileForm" (ngSubmit)="enregistrerProfil()">
+        <div class="field-row">
+          <div class="field">
+            <label for="titre">Titre</label>
+            <input id="titre" type="text" formControlName="titre" placeholder="Ex : Senior Recruiter" />
+          </div>
+          <div class="field">
+            <label for="telephone">Téléphone</label>
+            <input id="telephone" type="text" formControlName="telephone" />
+          </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="savingProfile()">
+          {{ savingProfile() ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </form>
+    </div>
+  }
+</div>

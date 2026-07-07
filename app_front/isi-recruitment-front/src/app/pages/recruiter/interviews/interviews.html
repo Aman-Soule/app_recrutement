@@ -1,1 +1,160 @@
-<p>interviews works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Gestion des entretiens</h1>
+      <p>Planifiez et suivez vos échanges avec les candidats.</p>
+    </div>
+    <button class="btn btn-primary" (click)="ouvrirCreation()">+ Planifier un entretien</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="card" style="margin-bottom: 20px">
+      <h2>Nouvel entretien</h2>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">{{ errorMessage() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="enregistrer()">
+        <div class="field">
+          <label for="application_id">Candidature</label>
+          <select id="application_id" formControlName="application_id">
+            @for (candidature of candidatures(); track candidature.id) {
+              <option [value]="candidature.id">{{ libelleCandidature(candidature) }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="type">Type</label>
+            <select id="type" formControlName="type">
+              <option value="video">Vidéo</option>
+              <option value="physique">Physique</option>
+              <option value="telephonique">Téléphonique</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="etape">Étape</label>
+            <select id="etape" formControlName="etape">
+              <option value="rh">RH</option>
+              <option value="technique">Technique</option>
+              <option value="culturel">Culturel</option>
+              <option value="final">Final</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="planifie_le">Date et heure</label>
+            <input id="planifie_le" type="datetime-local" formControlName="planifie_le" />
+          </div>
+          <div class="field">
+            <label for="duree_minutes">Durée (minutes)</label>
+            <input id="duree_minutes" type="number" min="15" max="240" formControlName="duree_minutes" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="lieu_ou_lien">Lieu / lien de visioconférence</label>
+          <input id="lieu_ou_lien" type="text" formControlName="lieu_ou_lien" />
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-outline" type="button" (click)="annuler()">Annuler</button>
+          <button class="btn btn-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Enregistrement...' : 'Planifier' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (feedbackTarget(); as cible) {
+    <div class="card" style="margin-bottom: 20px">
+      <h2>Feedback — {{ cible.candidature?.candidat?.utilisateur?.name }}</h2>
+      <form [formGroup]="feedbackForm" (ngSubmit)="enregistrerFeedback()">
+        <div class="field-row">
+          <div class="field">
+            <label for="note">Note (1-5)</label>
+            <input id="note" type="number" min="1" max="5" formControlName="note" />
+          </div>
+          <div class="field">
+            <label for="fb_statut">Statut final</label>
+            <select id="fb_statut" formControlName="statut">
+              <option value="termine">Terminé</option>
+              <option value="annule">Annulé</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="feedback">Commentaire</label>
+          <textarea id="feedback" rows="3" formControlName="feedback"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-outline" type="button" (click)="fermerFeedback()">Annuler</button>
+          <button class="btn btn-primary" type="submit">Enregistrer le feedback</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      <h2>À venir</h2>
+      @for (entretien of aVenir(); track entretien.id) {
+        <div class="interview-item">
+          <div class="interview-item__date">
+            <span>{{ entretien.planifie_le | date: 'dd/MM' }}</span>
+            <span>{{ entretien.planifie_le | date: 'HH:mm' }}</span>
+          </div>
+          <div class="interview-item__info">
+            <p class="interview-item__name">
+              {{ entretien.candidature?.candidat?.utilisateur?.name }}
+            </p>
+            <p class="interview-item__meta">
+              {{ entretien.candidature?.offre?.titre }} · {{ libellesEtape[entretien.etape] }} ·
+              {{ entretien.duree_minutes }} min
+            </p>
+          </div>
+          <span class="badge badge-info">{{ libellesStatut[entretien.statut] }}</span>
+          <button class="btn btn-outline btn-sm" (click)="ouvrirFeedback(entretien)">Feedback</button>
+        </div>
+      } @empty {
+        <p class="empty-state">Aucun entretien à venir.</p>
+      }
+    </div>
+
+    <div class="card" style="margin-top: 20px">
+      <h2>Passés</h2>
+      @for (entretien of passes(); track entretien.id) {
+        <div class="interview-item">
+          <div class="interview-item__date">
+            <span>{{ entretien.planifie_le | date: 'dd/MM' }}</span>
+            <span>{{ entretien.planifie_le | date: 'HH:mm' }}</span>
+          </div>
+          <div class="interview-item__info">
+            <p class="interview-item__name">
+              {{ entretien.candidature?.candidat?.utilisateur?.name }}
+            </p>
+            <p class="interview-item__meta">
+              {{ entretien.candidature?.offre?.titre }} · {{ libellesEtape[entretien.etape] }}
+              @if (entretien.note) {
+                · Note : {{ entretien.note }}/5
+              }
+            </p>
+          </div>
+          <span class="badge badge-neutral">{{ libellesStatut[entretien.statut] }}</span>
+          @if (entretien.statut === 'confirme' || entretien.statut === 'en_attente') {
+            <button class="btn btn-outline btn-sm" (click)="ouvrirFeedback(entretien)">Feedback</button>
+          }
+        </div>
+      } @empty {
+        <p class="empty-state">Aucun entretien passé.</p>
+      }
+    </div>
+  }
+</div>

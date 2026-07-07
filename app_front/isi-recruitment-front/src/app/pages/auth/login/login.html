@@ -1,1 +1,54 @@
-<p>login works!</p>
+<div class="auth">
+  <div class="auth__hero">
+    <div class="auth__brand">
+      <span class="auth__logo">T</span>
+      <span>TalentAI</span>
+    </div>
+    <h1>Le recrutement intelligent pour l'ère moderne.</h1>
+    <p>
+      Découvrez les meilleurs talents sans effort. Notre plateforme simplifie votre processus de
+      recrutement.
+    </p>
+  </div>
+
+  <div class="auth__panel">
+    <div class="auth__form-wrap">
+      <h2>Bon retour</h2>
+      <p class="auth__subtitle">Veuillez saisir vos informations pour vous connecter.</p>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">{{ errorMessage() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="field">
+          <label for="email">Adresse e-mail</label>
+          <input id="email" type="email" formControlName="email" placeholder="nom@entreprise.com" />
+        </div>
+
+        <div class="field">
+          <label for="password">Mot de passe</label>
+          <div class="password-input">
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+            />
+            <button type="button" class="password-toggle" (click)="showPassword.set(!showPassword())">
+              {{ showPassword() ? 'Masquer' : 'Afficher' }}
+            </button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit" [disabled]="loading()">
+          {{ loading() ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <p class="auth__switch">
+        Vous n'avez pas de compte ? <a routerLink="/register">S'inscrire</a>
+      </p>
+    </div>
+  </div>
+</div>

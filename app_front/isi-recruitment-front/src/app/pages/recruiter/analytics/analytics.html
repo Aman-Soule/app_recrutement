@@ -1,1 +1,61 @@
-<p>analytics works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Analyses</h1>
+      <p>Aperçu de votre activité de recrutement.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="grid grid-4">
+      <div class="card stat-card">
+        <div class="stat-card__icon">💼</div>
+        <div>
+          <div class="stat-card__value">{{ offresActives() }}</div>
+          <div class="stat-card__label">Offres actives</div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card__icon">📄</div>
+        <div>
+          <div class="stat-card__value">{{ totalCandidatures() }}</div>
+          <div class="stat-card__label">Candidatures reçues</div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card__icon">📅</div>
+        <div>
+          <div class="stat-card__value">{{ totalEntretiens() }}</div>
+          <div class="stat-card__label">Entretiens planifiés</div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card__icon">🎯</div>
+        <div>
+          <div class="stat-card__value">{{ scoreMoyen() }}%</div>
+          <div class="stat-card__label">Score matching moyen</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 24px">
+      <h2>Répartition des statuts</h2>
+      <p class="repartition-hint">Basé sur les candidatures récentes.</p>
+
+      @if (candidatures().length) {
+        <div class="chart-wrap">
+          <canvas
+            baseChart
+            [data]="repartitionStatutsChartData()"
+            [options]="doughnutChartOptions"
+            type="doughnut"
+          ></canvas>
+        </div>
+      } @else {
+        <p class="empty-state">Aucune candidature à analyser pour le moment.</p>
+      }
+    </div>
+  }
+</div>

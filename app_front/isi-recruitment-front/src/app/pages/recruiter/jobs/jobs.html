@@ -1,1 +1,181 @@
-<p>jobs works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Gestion des offres</h1>
+      <p>Gérez et suivez vos recrutements en cours.</p>
+    </div>
+    <button class="btn btn-primary" (click)="ouvrirCreation()">+ Créer une offre</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="card" style="margin-bottom: 20px">
+      <h2>{{ editingId() ? "Modifier l'offre" : 'Nouvelle offre' }}</h2>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">{{ errorMessage() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="enregistrer()">
+        <div class="field-row">
+          <div class="field">
+            <label for="titre">Titre du poste</label>
+            <input id="titre" type="text" formControlName="titre" required />
+          </div>
+          <div class="field">
+            <label for="departement">Département</label>
+            <input id="departement" type="text" formControlName="departement" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="localisation">Localisation</label>
+            <input id="localisation" type="text" formControlName="localisation" />
+          </div>
+          <div class="field">
+            <label for="statut">Statut</label>
+            <select id="statut" formControlName="statut">
+              <option value="brouillon">Brouillon</option>
+              <option value="actif">Actif</option>
+              <option value="ferme">Fermé</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="type_contrat">Type de contrat</label>
+            <select id="type_contrat" formControlName="type_contrat">
+              <option value="temps_plein">Temps plein</option>
+              <option value="temps_partiel">Temps partiel</option>
+              <option value="freelance">Freelance</option>
+              <option value="stage">Stage</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="type_lieu">Type de lieu</label>
+            <select id="type_lieu" formControlName="type_lieu">
+              <option value="presentiel">Présentiel</option>
+              <option value="hybride">Hybride</option>
+              <option value="teletravail">Télétravail</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" rows="3" formControlName="description"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-outline" type="button" (click)="annuler()">Annuler</button>
+          <button class="btn btn-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="list-toolbar">
+    @if (vue() === 'liste') {
+      <div class="tabs">
+        <button [class.active]="onglet() === 'toutes'" (click)="changerOnglet('toutes')">Toutes</button>
+        <button [class.active]="onglet() === 'actif'" (click)="changerOnglet('actif')">Actives</button>
+        <button [class.active]="onglet() === 'brouillon'" (click)="changerOnglet('brouillon')">
+          Brouillons
+        </button>
+        <button [class.active]="onglet() === 'ferme'" (click)="changerOnglet('ferme')">Fermées</button>
+      </div>
+    } @else {
+      <div></div>
+    }
+
+    <div class="view-toggle">
+      <button [class.active]="vue() === 'liste'" (click)="changerVue('liste')" title="Vue liste">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+        </svg>
+      </button>
+      <button [class.active]="vue() === 'kanban'" (click)="changerVue('kanban')" title="Vue Kanban">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="4" width="5" height="16" rx="1" />
+          <rect x="10" y="4" width="5" height="10" rx="1" />
+          <rect x="17" y="4" width="5" height="13" rx="1" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else if (vue() === 'liste') {
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Titre du poste</th>
+              <th>Département</th>
+              <th>Lieu</th>
+              <th>Candidats</th>
+              <th>Statut</th>
+              <th>Publication</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (offre of offres(); track offre.id) {
+              <tr>
+                <td>
+                  <strong>{{ offre.titre }}</strong>
+                  <div class="job-ref">Réf : {{ offre.reference }}</div>
+                </td>
+                <td>{{ offre.departement || '—' }}</td>
+                <td>{{ offre.localisation || '—' }}</td>
+                <td>{{ offre.nombre_candidats }}</td>
+                <td><span class="badge" [ngClass]="badgeClass(offre.statut)">{{ offre.statut }}</span></td>
+                <td>{{ offre.publie_le ? (offre.publie_le | date: 'dd/MM/yyyy') : '—' }}</td>
+                <td class="actions-cell">
+                  <button class="btn btn-outline btn-sm" (click)="ouvrirEdition(offre)">Modifier</button>
+                  <button class="btn btn-danger btn-sm" (click)="supprimer(offre)">Supprimer</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-state">Aucune offre pour l'instant.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="kanban">
+      @for (colonne of offresParColonne(); track colonne.statut) {
+        <div class="kanban__column">
+          <div class="kanban__column-header">
+            <span>{{ colonne.label }}</span>
+            <span class="kanban__count">{{ colonne.offres.length }}</span>
+          </div>
+          @for (offre of colonne.offres; track offre.id) {
+            <div class="kanban-card">
+              <p class="kanban-card__title">{{ offre.titre }}</p>
+              <p class="kanban-card__meta">{{ offre.departement || 'Sans département' }}</p>
+              <p class="kanban-card__meta">{{ offre.localisation || '—' }}</p>
+              <div class="kanban-card__footer">
+                <span class="badge badge-neutral">{{ offre.nombre_candidats }} candidat(s)</span>
+              </div>
+              <div class="kanban-card__actions">
+                <button class="btn btn-outline btn-sm" (click)="ouvrirEdition(offre)">Modifier</button>
+                <button class="btn btn-danger btn-sm" (click)="supprimer(offre)">Supprimer</button>
+              </div>
+            </div>
+          } @empty {
+            <p class="kanban__empty">Aucune offre</p>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

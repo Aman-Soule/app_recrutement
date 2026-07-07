@@ -1,0 +1,44 @@
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.competences-hint {
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+
+.competences-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.competence-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+}
+
+.competence-row.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.competence-row select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--gray-300);
+  font-size: 0.78rem;
+}

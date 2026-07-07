@@ -1,65 +1,50 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { API_BASE_URL } from './api';
+import { JobOffer } from '../models/job.model';
+import { PaginatedResponse } from '../models/pagination.model';
 
-export interface Job {
-  id: number;
-  title: string;
-  company: string;
-  location: string;
-  type: 'Full-time' | 'Part-time' | 'Hybrid' | 'Remote';
-  salary: string;
-  matchScore: number;
-  skills: string[];
-  description: string;
-  logo: string;
+export interface JobFilters {
+  statut?: string;
+  type_lieu?: string;
+  type_contrat?: string;
+  recherche?: string;
+  mine?: boolean;
+  page?: number;
 }
 
 @Injectable({ providedIn: 'root' })
 export class JobService {
-  private jobs: Job[] = [
-    {
-      id: 1,
-      title: 'Lead UX Researcher',
-      company: 'Spotify',
-      location: 'Stockholm, SE',
-      type: 'Remote',
-      salary: '$120k - $160k',
-      matchScore: 98,
-      skills: ['Research Methods', 'Design Systems'],
-      description: 'Matched your Research Methods & Design Systems skills',
-      logo: 'spotify'
-    },
-    {
-      id: 2,
-      title: 'Senior Product Designer',
-      company: 'Airbnb',
-      location: 'San Francisco, US',
-      type: 'Hybrid',
-      salary: '$140k - $190k',
-      matchScore: 91,
-      skills: ['Figma Mastery', 'Visual Design'],
-      description: 'Matched your Figma Mastery & Visual Design expertise',
-      logo: 'airbnb'
-    },
-    {
-      id: 3,
-      title: 'UX Engineer',
-      company: 'Stripe',
-      location: 'Dublin, IE',
-      type: 'Remote',
-      salary: '$110k - $150k',
-      matchScore: 85,
-      skills: ['React.js', 'Prototyping'],
-      description: 'Matched your React.js & Prototyping skills',
-      logo: 'stripe'
-    }
-  ];
+  private http = inject(HttpClient);
 
-  getRecommendedJobs(): Observable<Job[]> {
-    return of(this.jobs);
+  list(filters: JobFilters = {}): Observable<PaginatedResponse<JobOffer>> {
+    let params = new HttpParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    }
+    return this.http.get<PaginatedResponse<JobOffer>>(`${API_BASE_URL}/offres`, { params });
   }
 
-  getJobById(id: number): Observable<Job | undefined> {
-    return of(this.jobs.find(job => job.id === id));
+  get(id: number): Observable<JobOffer> {
+    return this.http.get<JobOffer>(`${API_BASE_URL}/offres/${id}`);
+  }
+
+  create(payload: Partial<JobOffer>): Observable<{ message: string; offre: JobOffer }> {
+    return this.http.post<{ message: string; offre: JobOffer }>(`${API_BASE_URL}/offres`, payload);
+  }
+
+  update(id: number, payload: Partial<JobOffer>): Observable<{ message: string; offre: JobOffer }> {
+    return this.http.put<{ message: string; offre: JobOffer }>(`${API_BASE_URL}/offres/${id}`, payload);
+  }
+
+  delete(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${API_BASE_URL}/offres/${id}`);
+  }
+
+  recommandees(): Observable<JobOffer[]> {
+    return this.http.get<JobOffer[]>(`${API_BASE_URL}/candidat/offres-recommandees`);
   }
 }

@@ -1,0 +1,49 @@
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filters input,
+.filters select {
+  padding: 9px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.filters input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.job-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.job-row__title {
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.job-row__meta {
+  color: var(--gray-500);
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.job-row__description {
+  color: var(--gray-600);
+  font-size: 0.85rem;
+  margin-top: 8px;
+  max-width: 480px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}

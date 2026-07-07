@@ -1,1 +1,119 @@
-<p>dashboard works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Tableau de bord Recruteur</h1>
+      <p>Voici l'activité de votre équipe de recrutement.</p>
+    </div>
+    <a routerLink="/recruiter/jobs" class="btn btn-primary">+ Nouvelle offre</a>
+  </div>
+
+  <div class="grid grid-4">
+    <div class="card stat-card">
+      <div class="stat-card__icon">💼</div>
+      <div>
+        <div class="stat-card__value">{{ offresActives() }}</div>
+        <div class="stat-card__label">Offres actives</div>
+      </div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-card__icon">📝</div>
+      <div>
+        <div class="stat-card__value">{{ offresBrouillons() }}</div>
+        <div class="stat-card__label">Brouillons</div>
+      </div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-card__icon">👥</div>
+      <div>
+        <div class="stat-card__value">{{ totalCandidats() }}</div>
+        <div class="stat-card__label">Candidats (offres actives)</div>
+      </div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-card__icon">📅</div>
+      <div>
+        <div class="stat-card__value">{{ entretiensAujourdhui() }}</div>
+        <div class="stat-card__label">Entretiens aujourd'hui</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top: 24px">
+    <div class="card">
+      <h2>Candidatures récentes</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Candidat</th>
+              <th>Poste</th>
+              <th>Score</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (candidature of candidaturesRecentes(); track candidature.id) {
+              <tr>
+                <td>{{ candidature.candidat?.utilisateur?.name }}</td>
+                <td>{{ candidature.offre?.titre }}</td>
+                <td>{{ candidature.score_matching_ia ?? '—' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="badgeClass(candidature.statut)">
+                    {{ libelles[candidature.statut] }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-state">Aucune candidature pour le moment.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Prochains entretiens</h2>
+      @for (entretien of prochainsEntretiens(); track entretien.id) {
+        <div class="interview-row">
+          <div>
+            <p class="interview-row__name">
+              {{ entretien.candidature?.candidat?.utilisateur?.name }}
+            </p>
+            <p class="interview-row__meta">{{ entretien.candidature?.offre?.titre }}</p>
+          </div>
+          <span class="interview-row__date">{{ entretien.planifie_le | date: 'dd/MM HH:mm' }}</span>
+        </div>
+      } @empty {
+        <p class="empty-state">Aucun entretien planifié.</p>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top: 24px">
+    <div class="card">
+      <h2>Candidatures par statut</h2>
+      <div class="chart-wrap">
+        <canvas
+          baseChart
+          [data]="candidaturesParStatutChartData()"
+          [options]="barChartOptions"
+          type="bar"
+        ></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Entretiens des 7 prochains jours</h2>
+      <div class="chart-wrap">
+        <canvas
+          baseChart
+          [data]="entretiensParJourChartData()"
+          [options]="barChartOptions"
+          type="bar"
+        ></canvas>
+      </div>
+    </div>
+  </div>
+</div>

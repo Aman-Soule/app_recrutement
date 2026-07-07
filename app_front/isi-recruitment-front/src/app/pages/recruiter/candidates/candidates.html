@@ -1,1 +1,117 @@
-<p>candidates works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Base de candidats</h1>
+      <p>Consultez les candidats ayant postulé à vos offres.</p>
+    </div>
+  </div>
+
+  <div class="card filters">
+    <input
+      type="text"
+      placeholder="Rechercher un candidat par nom..."
+      [(ngModel)]="recherche"
+      (keyup.enter)="charger()"
+    />
+    <button class="btn btn-primary" (click)="charger()">Rechercher</button>
+  </div>
+
+  <div class="list-toolbar">
+    <div></div>
+    <div class="view-toggle">
+      <button [class.active]="vue() === 'liste'" (click)="changerVue('liste')" title="Vue liste">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+        </svg>
+      </button>
+      <button [class.active]="vue() === 'kanban'" (click)="changerVue('kanban')" title="Vue Kanban">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="4" width="5" height="16" rx="1" />
+          <rect x="10" y="4" width="5" height="10" rx="1" />
+          <rect x="17" y="4" width="5" height="13" rx="1" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else if (vue() === 'liste') {
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Candidat</th>
+              <th>Titre</th>
+              <th>Expérience</th>
+              <th>Force du profil</th>
+              <th>Disponibilité</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (candidat of candidats(); track candidat.id) {
+              <tr>
+                <td>
+                  <strong>{{ candidat.utilisateur?.name }}</strong>
+                  <div class="candidate-email">{{ candidat.utilisateur?.email }}</div>
+                </td>
+                <td>{{ candidat.titre || '—' }}</td>
+                <td>{{ candidat.annees_experience }} an(s)</td>
+                <td>
+                  <div class="mini-progress">
+                    <div class="mini-progress__bar" [style.width.%]="candidat.force_profil"></div>
+                  </div>
+                  {{ candidat.force_profil }}%
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="badgeClass(candidat.disponibilite)">
+                    {{ candidat.disponibilite }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-state">Aucun candidat pour l'instant.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (lastPage() > 1) {
+        <div class="pagination">
+          <button (click)="pagePrecedente()" [disabled]="currentPage() === 1">‹</button>
+          <span>Page {{ currentPage() }} / {{ lastPage() }}</span>
+          <button (click)="pageSuivante()" [disabled]="currentPage() === lastPage()">›</button>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="kanban">
+      @for (colonne of candidatsParColonne(); track colonne.disponibilite) {
+        <div class="kanban__column">
+          <div class="kanban__column-header">
+            <span>{{ colonne.label }}</span>
+            <span class="kanban__count">{{ colonne.candidats.length }}</span>
+          </div>
+          @for (candidat of colonne.candidats; track candidat.id) {
+            <div class="kanban-card">
+              <p class="kanban-card__title">{{ candidat.utilisateur?.name }}</p>
+              <p class="kanban-card__meta">{{ candidat.titre || 'Titre non renseigné' }}</p>
+              <p class="kanban-card__meta">{{ candidat.annees_experience }} an(s) d'expérience</p>
+              <div class="kanban-card__footer">
+                <div class="mini-progress">
+                  <div class="mini-progress__bar" [style.width.%]="candidat.force_profil"></div>
+                </div>
+                {{ candidat.force_profil }}%
+              </div>
+            </div>
+          } @empty {
+            <p class="kanban__empty">Aucun candidat</p>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
