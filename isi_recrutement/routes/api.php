@@ -60,6 +60,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/candidat/profil',              [CandidateProfileController::class, 'show']);
         Route::put('/candidat/profil',              [CandidateProfileController::class, 'update']);
         Route::post('/candidat/profil/competences', [CandidateProfileController::class, 'syncCompetences']);
+        Route::post('/candidat/profil/avatar',      [CandidateProfileController::class, 'uploadAvatar']);
+        Route::post('/candidat/profil/cv',          [CandidateProfileController::class, 'uploadCv']);
 
         // Candidatures
         Route::get('/candidat/candidatures',        [ApplicationController::class, 'mesCandidatures']);
@@ -78,13 +80,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:recruiter')->group(function () {
 
         // Profil recruteur
-        Route::get('/recruteur/profil', [RecruiterProfileController::class, 'show']);
-        Route::put('/recruteur/profil', [RecruiterProfileController::class, 'update']);
+        Route::get('/recruteur/profil',        [RecruiterProfileController::class, 'show']);
+        Route::put('/recruteur/profil',        [RecruiterProfileController::class, 'update']);
+        Route::post('/recruteur/profil/avatar', [RecruiterProfileController::class, 'uploadAvatar']);
+
+        // Vue d'ensemble recruteur (agrégats sur toutes ses offres)
+        Route::get('/recruteur/candidatures', [ApplicationController::class, 'pourRecruteur']);
+        Route::get('/recruteur/candidats',    [CandidateProfileController::class, 'pourRecruteur']);
 
         // Entreprise
-        Route::post('/entreprises',          [CompanyController::class, 'store']);
-        Route::get('/entreprises/{company}', [CompanyController::class, 'show']);
-        Route::put('/entreprises/{company}', [CompanyController::class, 'update']);
+        Route::post('/entreprises',              [CompanyController::class, 'store']);
+        Route::get('/entreprises/{company}',     [CompanyController::class, 'show']);
+        Route::put('/entreprises/{company}',     [CompanyController::class, 'update']);
+        Route::post('/entreprises/{company}/logo', [CompanyController::class, 'uploadLogo']);
 
         // Offres d'emploi
         Route::post('/offres',              [JobOfferController::class, 'store']);

@@ -3,10 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\CandidateProfile;
+use App\Traits\GereLesFichiers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CandidateProfileController extends Controller
 {
+    use GereLesFichiers;
+
+    /** Recruteur : voir les profils candidats ayant postulé à l'une de ses offres */
+    public function pourRecruteur(Request $request)
+    {
+        $recruteur = $request->user()->profilRecruteur;
+
+        $profils = CandidateProfile::whereHas('candidatures.offre', function ($q) use ($recruteur) {
+                $q->where('recruiter_profile_id', $recruteur->id);
+            })
+            ->with('utilisateur', 'competences')
+            ->when($request->recherche, function ($q) use ($request) {
+                $q->whereHas('utilisateur', function ($uq) use ($request) {
+                    $uq->where('name', 'like', "%{$request->recherche}%");
+                });
+            })
+            ->distinct()
+            ->paginate(10);
+
+        return response()->json($profils);
+    }
+
     /** Voir son propre profil candidat */
     public function show(Request $request)
     {
@@ -76,6 +100,47 @@ class CandidateProfileController extends Controller
         return response()->json([
             'message'     => 'Compétences mises à jour',
             'competences' => $profil->competences,
+        ]);
+    }
+
+    /** Mettre à jour la photo de profil */
+    public function uploadAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $profil = $request->user()->profilCandidat;
+        $this->supprimerAncienFichier($profil->avatar_url);
+
+        $chemin = $request->file('avatar')->store('avatars', 'public');
+        $profil->avatar_url = Storage::disk('public')->url($chemin);
+        $profil->save();
+
+        return response()->json([
+            'message' => 'Photo de profil mise à jour',
+            'profil'  => $profil,
+        ]);
+    }
+
+    /** Mettre à jour le CV */
+    public function uploadCv(Request $request)
+    {
+        $request->validate([
+            'cv' => 'required|mimes:pdf,doc,docx|max:5120',
+        ]);
+
+        $profil = $request->user()->profilCandidat;
+        $this->supprimerAncienFichier($profil->cv_url);
+
+        $chemin = $request->file('cv')->store('cvs', 'public');
+        $profil->cv_url = Storage::disk('public')->url($chemin);
+        $profil->force_profil = $this->calculerForceProfil($profil->fresh());
+        $profil->save();
+
+        return response()->json([
+            'message' => 'CV mis à jour',
+            'profil'  => $profil,
         ]);
     }
 

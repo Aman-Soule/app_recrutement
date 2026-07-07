@@ -14,8 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
 
-        // Active le mode stateful pour Sanctum
-        $middleware->statefulApi();
+        // Pas de mode stateful Sanctum : l'API utilise exclusivement des tokens Bearer
+        // (statefulApi() forcerait la vérification CSRF sur les requêtes venant de
+        // localhost, ce qui casse le login du front Angular en Bearer token).
 
         // Redirection si NON connecté → login
         $middleware->redirectGuestsTo(fn () => route('login'));

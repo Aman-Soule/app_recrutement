@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
-use App\Models\AiMatchScore;
+use App\Services\MatchingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class JobOfferController extends Controller
 {
+    public function __construct(private MatchingService $matchingService) {}
+
     /** Lister les offres (avec filtres) */
     public function index(Request $request)
     {
@@ -17,6 +19,9 @@ class JobOfferController extends Controller
             ->when($request->type_lieu, fn($q) => $q->where('type_lieu', $request->type_lieu))
             ->when($request->type_contrat, fn($q) => $q->where('type_contrat', $request->type_contrat))
             ->when($request->recherche, fn($q) => $q->where('titre', 'like', "%{$request->recherche}%"))
+            ->when($request->boolean('mine') && $request->user()->estRecruteur(), function ($q) use ($request) {
+                $q->where('recruiter_profile_id', $request->user()->profilRecruteur->id);
+            })
             ->latest('publie_le')
             ->paginate(10);
 
@@ -49,6 +54,12 @@ class JobOfferController extends Controller
         ]);
 
         $recruteur = $request->user()->profilRecruteur;
+
+        if (!$recruteur->company_id) {
+            return response()->json([
+                'message' => "Vous devez d'abord renseigner votre entreprise dans les Paramètres avant de publier une offre.",
+            ], 422);
+        }
 
         $offre = JobOffer::create([
             ...$request->all(),
@@ -102,8 +113,7 @@ class JobOfferController extends Controller
             ->with('entreprise', 'scoresMatching')
             ->get()
             ->map(function ($offre) use ($profil) {
-                // Calcul simple du score de matching
-                $offre->score_matching = $this->calculerScoreMatching($profil, $offre);
+                $offre->score_matching = $this->matchingService->calculerScore($profil, $offre);
                 return $offre;
             })
             ->sortByDesc('score_matching')
@@ -111,31 +121,5 @@ class JobOfferController extends Controller
             ->values();
 
         return response()->json($offres);
-    }
-
-    /** Calcul basique du score de matching IA */
-    private function calculerScoreMatching($profil, $offre): int
-    {
-        $score = 0;
-
-        if (!$offre->competences_requises || !$profil) return 0;
-
-        $competencesCandidat = $profil->competences->pluck('id')->toArray();
-        $competencesRequises = $offre->competences_requises;
-        $total = count($competencesRequises);
-
-        if ($total === 0) return 50;
-
-        // Score compétences (60%)
-        $matchees = count(array_intersect($competencesCandidat, $competencesRequises));
-        $score += ($matchees / $total) * 60;
-
-        // Score type de lieu (20%)
-        if ($profil->type_lieu_souhaite === $offre->type_lieu) $score += 20;
-
-        // Score type de contrat (20%)
-        if ($profil->type_contrat_souhaite === $offre->type_contrat) $score += 20;
-
-        return (int) min($score, 100);
     }
 }

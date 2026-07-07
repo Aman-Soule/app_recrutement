@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\JobOffer;
+use App\Services\MatchingService;
 use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
+    public function __construct(private MatchingService $matchingService) {}
+
     /** Candidat : postuler à une offre */
     public function store(Request $request, JobOffer $jobOffer)
     {
@@ -27,12 +30,15 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'Vous avez déjà postulé à cette offre'], 409);
         }
 
+        $profil->loadMissing('competences');
+
         $candidature = Application::create([
             'candidate_profile_id' => $profil->id,
             'job_offer_id'         => $jobOffer->id,
             'lettre_motivation'    => $request->lettre_motivation,
             'cv_url'               => $request->cv_url ?? $profil->cv_url,
             'statut'               => 'nouveau',
+            'score_matching_ia'    => $this->matchingService->calculerScore($profil, $jobOffer),
         ]);
 
         // Incrémenter le compteur de candidats
@@ -64,6 +70,21 @@ class ApplicationController extends Controller
         $candidatures = Application::where('job_offer_id', $jobOffer->id)
             ->with('candidat.utilisateur', 'candidat.competences')
             ->orderByDesc('score_matching_ia')
+            ->paginate(10);
+
+        return response()->json($candidatures);
+    }
+
+    /** Recruteur : voir toutes les candidatures reçues sur ses offres */
+    public function pourRecruteur(Request $request)
+    {
+        $recruteur = $request->user()->profilRecruteur;
+
+        $candidatures = Application::whereHas('offre', function ($q) use ($recruteur) {
+                $q->where('recruiter_profile_id', $recruteur->id);
+            })
+            ->with('candidat.utilisateur', 'offre')
+            ->latest()
             ->paginate(10);
 
         return response()->json($candidatures);

@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\LoginNotification;
 use App\Models\User;
 use App\Models\CandidateProfile;
 use App\Models\RecruiterProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -67,6 +70,8 @@ class AuthController extends Controller
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $this->envoyerEmailConnexion($user, $request);
+
         return response()->json([
             'message' => 'Connexion réussie',
             'user'    => $user,
@@ -96,5 +101,19 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Déconnexion réussie']);
+    }
+
+    /** Notifie l'utilisateur par email d'une nouvelle connexion (ne bloque jamais le login) */
+    private function envoyerEmailConnexion(User $user, Request $request): void
+    {
+        try {
+            Mail::to($user->email)->send(new LoginNotification(
+                $user,
+                now()->format('d/m/Y à H:i'),
+                $request->ip(),
+            ));
+        } catch (\Throwable $e) {
+            Log::warning('Échec de l\'envoi de l\'email de connexion : ' . $e->getMessage());
+        }
     }
 }

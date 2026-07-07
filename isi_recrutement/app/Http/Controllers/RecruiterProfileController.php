@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\RecruiterProfile;
+use App\Traits\GereLesFichiers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class RecruiterProfileController extends Controller
 {
+    use GereLesFichiers;
+
     /** Voir son propre profil recruteur */
     public function show(Request $request)
     {
@@ -32,6 +36,26 @@ class RecruiterProfileController extends Controller
 
         return response()->json([
             'message' => 'Profil recruteur mis à jour',
+            'profil'  => $profil->load('entreprise'),
+        ]);
+    }
+
+    /** Mettre à jour la photo de profil */
+    public function uploadAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $profil = $request->user()->profilRecruteur;
+        $this->supprimerAncienFichier($profil->avatar_url);
+
+        $chemin = $request->file('avatar')->store('avatars', 'public');
+        $profil->avatar_url = Storage::disk('public')->url($chemin);
+        $profil->save();
+
+        return response()->json([
+            'message' => 'Photo de profil mise à jour',
             'profil'  => $profil->load('entreprise'),
         ]);
     }
