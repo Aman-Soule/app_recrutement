@@ -24,7 +24,7 @@
           </thead>
           <tbody>
             @for (candidature of candidatures(); track candidature.id) {
-              <tr>
+              <tr class="row-clickable" (click)="selected.set(candidature)">
                 <td>{{ candidature.offre?.titre }}</td>
                 <td>{{ candidature.offre?.entreprise?.nom }}</td>
                 <td>{{ candidature.score_matching_ia ?? '—' }}</td>
@@ -53,3 +53,11 @@
     }
   </div>
 </div>
+
+@if (selected(); as candidature) {
+  <app-application-detail-modal
+    [application]="candidature"
+    role="candidate"
+    (close)="selected.set(null)"
+  />
+}

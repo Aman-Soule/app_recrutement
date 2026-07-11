@@ -12,10 +12,11 @@ import {
   StatutCandidature,
 } from '../../../models/application.model';
 import { Interview } from '../../../models/interview.model';
+import { ApplicationDetailModal } from '../../../shared/components/application-detail-modal/application-detail-modal';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [DatePipe, NgClass, RouterLink, BaseChartDirective],
+  imports: [DatePipe, NgClass, RouterLink, BaseChartDirective, ApplicationDetailModal],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -31,6 +32,7 @@ export class Dashboard implements OnInit {
   readonly totalCandidats = signal(0);
   readonly candidatures = signal<Application[]>([]);
   readonly entretiens = signal<Interview[]>([]);
+  readonly selectedCandidature = signal<Application | null>(null);
 
   readonly candidaturesRecentes = computed(() => this.candidatures().slice(0, 5));
 
@@ -121,6 +123,13 @@ export class Dashboard implements OnInit {
       next: (entretiens) => this.entretiens.set(entretiens),
       error: () => {},
     });
+  }
+
+  onStatutChange(updated: Application): void {
+    this.candidatures.update((liste) =>
+      liste.map((c) => (c.id === updated.id ? updated : c)),
+    );
+    this.selectedCandidature.set(updated);
   }
 
   private estAujourdhui(dateIso: string): boolean {

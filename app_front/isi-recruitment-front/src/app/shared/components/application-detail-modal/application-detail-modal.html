@@ -1,0 +1,102 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+    <div class="modal-panel__header">
+      <div>
+        <h2>{{ application.offre?.titre }}</h2>
+        <p class="modal-panel__subtitle">
+          @if (role === 'recruiter') {
+            {{ application.candidat?.utilisateur?.name }}
+          } @else {
+            {{ application.offre?.entreprise?.nom }}
+          }
+        </p>
+      </div>
+      <button type="button" class="modal-panel__close" (click)="close.emit()">&times;</button>
+    </div>
+
+    <div class="modal-panel__body">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-item__label">Score IA</span>
+          <span class="detail-item__value">{{ application.score_matching_ia ?? '—' }}%</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-item__label">Statut</span>
+          <span class="badge" [ngClass]="badgeClass(application.statut)">
+            {{ libelles[application.statut] }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-item__label">Lieu</span>
+          <span class="detail-item__value">{{ application.offre?.localisation ?? '—' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-item__label">Date de candidature</span>
+          <span class="detail-item__value">{{ application.postule_le | date: 'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      @if (application.lettre_motivation) {
+        <div class="detail-section">
+          <h3>Lettre de motivation</h3>
+          <p class="detail-section__text">{{ application.lettre_motivation }}</p>
+        </div>
+      }
+
+      @if (application.cv_url) {
+        <div class="detail-section">
+          <a [href]="application.cv_url" target="_blank" rel="noopener" class="btn btn-secondary">
+            Voir le CV
+          </a>
+        </div>
+      }
+
+      @if (application.entretiens?.length) {
+        <div class="detail-section">
+          <h3>Entretiens</h3>
+          @for (entretien of application.entretiens; track entretien.id) {
+            <div class="interview-row">
+              <div>
+                <p class="interview-row__name">{{ libellesEtape[entretien.etape] }}</p>
+                <p class="interview-row__meta">{{ libellesStatutEntretien[entretien.statut] }}</p>
+              </div>
+              <span class="interview-row__date">
+                {{ entretien.planifie_le | date: 'dd/MM/yyyy HH:mm' }}
+              </span>
+            </div>
+          }
+        </div>
+      }
+
+      @if (role === 'recruiter') {
+        <div class="detail-section">
+          <h3>Mettre à jour le statut</h3>
+          <div class="status-form">
+            <select class="status-form__select" [(ngModel)]="statutForm">
+              @for (statut of statuts; track statut) {
+                <option [value]="statut">{{ libelles[statut] }}</option>
+              }
+            </select>
+            <textarea
+              class="status-form__notes"
+              placeholder="Notes internes sur ce candidat..."
+              rows="3"
+              [(ngModel)]="notesForm"
+            ></textarea>
+            @if (error()) {
+              <p class="status-form__error">{{ error() }}</p>
+            }
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="saving()"
+              (click)="enregistrerStatut()"
+            >
+              {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

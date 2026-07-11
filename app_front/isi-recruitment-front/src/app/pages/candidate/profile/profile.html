@@ -37,7 +37,12 @@
         </div>
 
         <div class="upload-block">
-          <div class="upload-cv-icon">📄</div>
+          <div class="upload-cv-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+              <path d="M14 3v5h5" />
+            </svg>
+          </div>
           <div>
             <label class="btn btn-outline btn-sm upload-label">
               {{ uploadingCv() ? 'Envoi...' : (profil()?.cv_url ? 'Remplacer le CV' : 'Ajouter un CV') }}

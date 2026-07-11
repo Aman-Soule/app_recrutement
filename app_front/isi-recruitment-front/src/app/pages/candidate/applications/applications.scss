@@ -1,3 +1,11 @@
 :host {
   display: block;
 }
+
+.row-clickable {
+  cursor: pointer;
+}
+
+.row-clickable:hover {
+  background: var(--gray-50);
+}

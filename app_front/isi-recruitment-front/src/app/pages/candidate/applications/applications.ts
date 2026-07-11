@@ -6,10 +6,11 @@ import {
   LIBELLES_STATUT_CANDIDATURE,
   StatutCandidature,
 } from '../../../models/application.model';
+import { ApplicationDetailModal } from '../../../shared/components/application-detail-modal/application-detail-modal';
 
 @Component({
   selector: 'app-applications',
-  imports: [DatePipe, NgClass],
+  imports: [DatePipe, NgClass, ApplicationDetailModal],
   templateUrl: './applications.html',
   styleUrl: './applications.scss',
 })
@@ -19,6 +20,7 @@ export class Applications implements OnInit {
   readonly candidatures = signal<Application[]>([]);
   readonly loading = signal(true);
   readonly libelles = LIBELLES_STATUT_CANDIDATURE;
+  readonly selected = signal<Application | null>(null);
 
   ngOnInit(): void {
     this.applicationService.mesCandidatures().subscribe({

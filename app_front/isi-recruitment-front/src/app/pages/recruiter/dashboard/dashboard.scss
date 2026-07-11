@@ -1,3 +1,11 @@
+.row-clickable {
+  cursor: pointer;
+}
+
+.row-clickable:hover {
+  background: var(--gray-50);
+}
+
 .interview-row {
   display: flex;
   align-items: center;
