@@ -71,6 +71,11 @@
                 <path d="M14 3v5h5" />
               </svg>
             }
+            @case ('message') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 5h16v11H8l-4 4V5Z" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            }
             @case ('user') {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <circle cx="12" cy="8" r="4" />
@@ -83,4 +88,15 @@
       </a>
     }
   </nav>
+
+  <button type="button" class="sidebar__link sidebar__logout" (click)="seDeconnecter()">
+    <span class="sidebar__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-linecap="round" />
+        <path d="M16 17l5-5-5-5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M21 12H9" stroke-linecap="round" />
+      </svg>
+    </span>
+    <span>Se déconnecter</span>
+  </button>
 </aside>

@@ -1,0 +1,62 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Modifier l'entreprise</h1>
+      <p>Ces informations sont visibles par les candidats sur vos offres.</p>
+    </div>
+    <button class="btn btn-outline" type="button" (click)="annuler()">Annuler</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      <form [formGroup]="companyForm" (ngSubmit)="enregistrer()">
+        <div class="field-row">
+          <div class="field">
+            <label for="nom">Nom de l'entreprise</label>
+            <input id="nom" type="text" formControlName="nom" />
+          </div>
+          <div class="field">
+            <label for="secteur">Secteur d'activité</label>
+            <input id="secteur" type="text" formControlName="secteur" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" rows="3" formControlName="description"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="site_web">Site web</label>
+            <input id="site_web" type="url" formControlName="site_web" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label for="taille">Taille</label>
+            <select id="taille" formControlName="taille">
+              <option value="">Non précisée</option>
+              <option value="startup">Startup</option>
+              <option value="pme">PME</option>
+              <option value="grand_groupe">Grand groupe</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="localisation">Localisation</label>
+          <input id="localisation" type="text" formControlName="localisation" />
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+        </button>
+      </form>
+    </div>
+  }
+</div>

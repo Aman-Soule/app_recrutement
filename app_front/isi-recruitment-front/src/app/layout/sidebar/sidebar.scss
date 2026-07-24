@@ -6,6 +6,8 @@
   height: 100%;
   overflow-y: auto;
   padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-backdrop {
@@ -95,4 +97,19 @@
 .sidebar__icon svg {
   width: 100%;
   height: 100%;
+}
+
+.sidebar__logout {
+  margin-top: auto;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.sidebar__logout:hover {
+  background: var(--gray-50);
+  color: var(--danger);
 }

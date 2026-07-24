@@ -1,0 +1,67 @@
+<div class="page">
+  <a routerLink="/candidate/jobs" class="back-link">← Retour aux offres</a>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  } @else if (entreprise(); as entreprise) {
+    <div class="page-header">
+      <div class="company-header">
+        <div class="company-logo">
+          @if (entreprise.logo_url) {
+            <img [src]="entreprise.logo_url" alt="" />
+          } @else {
+            <span>{{ entreprise.nom[0] }}</span>
+          }
+        </div>
+        <div>
+          <h1>{{ entreprise.nom }}</h1>
+          <p>{{ entreprise.secteur || 'Secteur non précisé' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <h2>À propos</h2>
+        <p class="job-text">{{ entreprise.description || 'Aucune description disponible.' }}</p>
+
+        <div class="info-grid" style="margin-top: 20px">
+          <div class="info-item">
+            <span class="info-label">Taille</span>
+            <span class="info-value">{{ (entreprise.taille && libellesTaille[entreprise.taille]) || 'Non précisée' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Localisation</span>
+            <span class="info-value">{{ entreprise.localisation || 'Non précisée' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Site web</span>
+            <span class="info-value">
+              @if (entreprise.site_web) {
+                <a [href]="entreprise.site_web" target="_blank" rel="noopener">{{ entreprise.site_web }}</a>
+              } @else {
+                Non renseigné
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Offres actives</h2>
+        @if (entreprise.offres?.length) {
+          @for (offre of entreprise.offres; track offre.id) {
+            <a class="job-offer-row" [routerLink]="['/candidate/jobs', offre.id]">
+              <p class="interview-row__name">{{ offre.titre }}</p>
+              <p class="interview-row__meta">{{ offre.localisation || 'Lieu non précisé' }}</p>
+            </a>
+          }
+        } @else {
+          <p class="empty-state">Aucune offre active pour le moment.</p>
+        }
+      </div>
+    </div>
+  }
+</div>

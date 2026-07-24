@@ -51,7 +51,7 @@
           </thead>
           <tbody>
             @for (candidat of candidats(); track candidat.id) {
-              <tr>
+              <tr class="clickable-row" (click)="voirDetail(candidat.id)">
                 <td>
                   <strong>{{ candidat.utilisateur?.name }}</strong>
                   <div class="candidate-email">{{ candidat.utilisateur?.email }}</div>
@@ -96,7 +96,7 @@
             <span class="kanban__count">{{ colonne.candidats.length }}</span>
           </div>
           @for (candidat of colonne.candidats; track candidat.id) {
-            <div class="kanban-card">
+            <div class="kanban-card clickable-row" (click)="voirDetail(candidat.id)">
               <p class="kanban-card__title">{{ candidat.utilisateur?.name }}</p>
               <p class="kanban-card__meta">{{ candidat.titre || 'Titre non renseigné' }}</p>
               <p class="kanban-card__meta">{{ candidat.annees_experience }} an(s) d'expérience</p>

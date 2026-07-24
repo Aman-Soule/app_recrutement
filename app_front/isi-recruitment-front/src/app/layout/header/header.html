@@ -8,7 +8,7 @@
   <div class="header__spacer"></div>
 
   <div class="header__actions">
-    <button class="header__bell" type="button" aria-label="Notifications">
+    <button class="header__bell" type="button" aria-label="Notifications" (click)="irVersMessages()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path
           d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"
@@ -35,13 +35,5 @@
         }
       </div>
     </div>
-
-    <button class="header__logout" type="button" (click)="seDeconnecter()" title="Se déconnecter">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-linecap="round" />
-        <path d="M16 17l5-5-5-5" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M21 12H9" stroke-linecap="round" />
-      </svg>
-    </button>
   </div>
 </header>

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api';
 import { CandidateProfile, NiveauCompetence } from '../models/user.model';
 import { PaginatedResponse } from '../models/pagination.model';
+import { Application } from '../models/application.model';
 
 @Injectable({ providedIn: 'root' })
 export class CandidateProfileService {
@@ -36,6 +37,13 @@ export class CandidateProfileService {
     return this.http.get<PaginatedResponse<CandidateProfile>>(`${API_BASE_URL}/recruteur/candidats`, {
       params,
     });
+  }
+
+  /** Recruteur : détail complet d'un candidat ayant postulé à ses offres */
+  getById(id: number): Observable<{ profil: CandidateProfile; candidatures: Application[] }> {
+    return this.http.get<{ profil: CandidateProfile; candidatures: Application[] }>(
+      `${API_BASE_URL}/recruteur/candidats/${id}`,
+    );
   }
 
   uploadAvatar(fichier: File): Observable<{ message: string; profil: CandidateProfile }> {

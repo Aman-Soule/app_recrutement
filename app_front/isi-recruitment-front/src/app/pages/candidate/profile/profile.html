@@ -4,11 +4,9 @@
       <h1>Mon profil</h1>
       <p>Complétez votre profil pour améliorer votre visibilité auprès des recruteurs.</p>
     </div>
+    <a class="btn btn-outline" routerLink="/account">Compte et sécurité</a>
   </div>
 
-  @if (successMessage()) {
-    <div class="alert alert-success">{{ successMessage() }}</div>
-  }
   @if (errorMessage()) {
     <div class="alert alert-error">{{ errorMessage() }}</div>
   }
@@ -61,111 +59,87 @@
     </div>
 
     <div class="card" style="margin-top: 20px">
-      <h2>Informations générales</h2>
-      <form [formGroup]="form" (ngSubmit)="enregistrerProfil()">
-        <div class="field-row">
-          <div class="field">
-            <label for="titre">Titre professionnel</label>
-            <input id="titre" type="text" formControlName="titre" placeholder="Ex : Développeur Full-Stack" />
-          </div>
-          <div class="field">
-            <label for="localisation">Localisation</label>
-            <input id="localisation" type="text" formControlName="localisation" placeholder="Ville, Pays" />
-          </div>
-        </div>
+      <div class="section-header">
+        <h2>Informations générales</h2>
+        <a class="btn btn-outline btn-sm" routerLink="/candidate/profile/edit">Modifier</a>
+      </div>
 
-        <div class="field">
-          <label for="biographie">Biographie</label>
-          <textarea id="biographie" rows="4" formControlName="biographie"></textarea>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Titre professionnel</span>
+          <span class="info-value">{{ profil()?.titre || 'Non renseigné' }}</span>
         </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label for="portfolio_url">Portfolio (URL)</label>
-            <input id="portfolio_url" type="url" formControlName="portfolio_url" placeholder="https://..." />
-          </div>
-          <div class="field">
-            <label for="linkedin_url">LinkedIn (URL)</label>
-            <input id="linkedin_url" type="url" formControlName="linkedin_url" placeholder="https://linkedin.com/in/..." />
-          </div>
+        <div class="info-item">
+          <span class="info-label">Localisation</span>
+          <span class="info-value">{{ profil()?.localisation || 'Non renseignée' }}</span>
         </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label for="annees_experience">Années d'expérience</label>
-            <input id="annees_experience" type="number" min="0" formControlName="annees_experience" />
-          </div>
-          <div class="field">
-            <label for="disponibilite">Disponibilité</label>
-            <select id="disponibilite" formControlName="disponibilite">
-              <option value="disponible">Disponible</option>
-              <option value="a_lecoute">À l'écoute d'opportunités</option>
-              <option value="non_disponible">Non disponible</option>
-            </select>
-          </div>
+        <div class="info-item info-item--full">
+          <span class="info-label">Biographie</span>
+          <span class="info-value">{{ profil()?.biographie || 'Non renseignée' }}</span>
         </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label for="type_contrat_souhaite">Contrat souhaité</label>
-            <select id="type_contrat_souhaite" formControlName="type_contrat_souhaite">
-              <option value="">Non précisé</option>
-              <option value="temps_plein">Temps plein</option>
-              <option value="temps_partiel">Temps partiel</option>
-              <option value="freelance">Freelance</option>
-              <option value="stage">Stage</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="type_lieu_souhaite">Lieu de travail souhaité</label>
-            <select id="type_lieu_souhaite" formControlName="type_lieu_souhaite">
-              <option value="">Non précisé</option>
-              <option value="teletravail">Télétravail</option>
-              <option value="hybride">Hybride</option>
-              <option value="presentiel">Présentiel</option>
-            </select>
-          </div>
+        <div class="info-item">
+          <span class="info-label">Portfolio</span>
+          <span class="info-value">
+            @if (profil()?.portfolio_url) {
+              <a [href]="profil()?.portfolio_url" target="_blank" rel="noopener">{{ profil()?.portfolio_url }}</a>
+            } @else {
+              Non renseigné
+            }
+          </span>
         </div>
-
-        <button class="btn btn-primary" type="submit" [disabled]="saving()">
-          {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
-        </button>
-      </form>
+        <div class="info-item">
+          <span class="info-label">LinkedIn</span>
+          <span class="info-value">
+            @if (profil()?.linkedin_url) {
+              <a [href]="profil()?.linkedin_url" target="_blank" rel="noopener">{{ profil()?.linkedin_url }}</a>
+            } @else {
+              Non renseigné
+            }
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Années d'expérience</span>
+          <span class="info-value">{{ profil()?.annees_experience ?? 0 }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Disponibilité</span>
+          <span class="info-value">
+            {{ profil() ? libellesDisponibilite[profil()!.disponibilite] : '' }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Contrat souhaité</span>
+          <span class="info-value">
+            {{ (profil()?.type_contrat_souhaite && libellesContrat[profil()!.type_contrat_souhaite!]) || 'Non précisé' }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Lieu de travail souhaité</span>
+          <span class="info-value">
+            {{ (profil()?.type_lieu_souhaite && libellesLieu[profil()!.type_lieu_souhaite!]) || 'Non précisé' }}
+          </span>
+        </div>
+      </div>
     </div>
 
     <div class="card" style="margin-top: 20px">
-      <h2>Compétences</h2>
-      <p class="competences-hint">Sélectionnez vos compétences et précisez votre niveau.</p>
-
-      <div class="competences-grid">
-        @for (competence of toutesCompetences(); track competence.id) {
-          <div class="competence-row" [class.active]="estSelectionnee(competence.id)">
-            <label class="checkbox-field">
-              <input
-                type="checkbox"
-                [checked]="estSelectionnee(competence.id)"
-                (change)="toggleCompetence(competence.id)"
-              />
-              {{ competence.nom }}
-            </label>
-            @if (estSelectionnee(competence.id)) {
-              <select
-                [ngModel]="niveauDe(competence.id)"
-                (ngModelChange)="changerNiveau(competence.id, $event)"
-                [ngModelOptions]="{ standalone: true }"
-              >
-                @for (niveau of niveaux; track niveau) {
-                  <option [value]="niveau">{{ niveau }}</option>
-                }
-              </select>
-            }
-          </div>
-        }
+      <div class="section-header">
+        <h2>Compétences</h2>
+        <a class="btn btn-outline btn-sm" routerLink="/candidate/profile/skills">Modifier</a>
       </div>
 
-      <button class="btn btn-primary" type="button" (click)="enregistrerCompetences()" [disabled]="savingCompetences()">
-        {{ savingCompetences() ? 'Enregistrement...' : 'Enregistrer les compétences' }}
-      </button>
+      @if (competences().length) {
+        <div class="competences-selected">
+          @for (competence of competences(); track competence.id) {
+            <div class="competence-chip competence-chip--readonly">
+              <span>{{ competence.nom }}</span>
+              <span class="badge badge-info">{{ competence.niveau }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="empty-state">Aucune compétence renseignée pour le moment.</p>
+      }
     </div>
   }
 </div>

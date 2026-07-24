@@ -2,7 +2,7 @@
   <div class="page-header">
     <div>
       <h1>Trouver des offres</h1>
-      <p>Parcourez les offres actives et postulez en un clic.</p>
+      <p>Parcourez les offres actives et consultez le détail avant de postuler.</p>
     </div>
   </div>
 
@@ -45,21 +45,18 @@
               <p class="job-row__description">{{ offre.description }}</p>
             }
           </div>
-          <button
+          <a
             class="btn"
-            [class.btn-primary]="!dejaPostule(offre.id)"
             [class.btn-outline]="dejaPostule(offre.id)"
-            [disabled]="dejaPostule(offre.id) || postulationEnCours() === offre.id"
-            (click)="postuler(offre)"
+            [class.btn-primary]="!dejaPostule(offre.id)"
+            [routerLink]="['/candidate/jobs', offre.id]"
           >
             @if (dejaPostule(offre.id)) {
-              Déjà postulé
-            } @else if (postulationEnCours() === offre.id) {
-              Envoi...
+              Déjà postulé · Voir l'offre
             } @else {
-              Postuler
+              Voir l'offre
             }
-          </button>
+          </a>
         </div>
       } @empty {
         <p class="empty-state">Aucune offre ne correspond à votre recherche.</p>

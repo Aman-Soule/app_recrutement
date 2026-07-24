@@ -1,0 +1,36 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Modifier mon profil</h1>
+      <p>Ces informations sont visibles par les candidats.</p>
+    </div>
+    <button class="btn btn-outline" type="button" (click)="annuler()">Annuler</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      <form [formGroup]="profileForm" (ngSubmit)="enregistrer()">
+        <div class="field-row">
+          <div class="field">
+            <label for="titre">Titre</label>
+            <input id="titre" type="text" formControlName="titre" placeholder="Ex : Senior Recruiter" />
+          </div>
+          <div class="field">
+            <label for="telephone">Téléphone</label>
+            <input id="telephone" type="text" formControlName="telephone" />
+          </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </form>
+    </div>
+  }
+</div>

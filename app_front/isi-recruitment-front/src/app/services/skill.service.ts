@@ -13,4 +13,11 @@ export class SkillService {
     if (recherche) params = params.set('recherche', recherche);
     return this.http.get<Skill[]>(`${API_BASE_URL}/competences`, { params });
   }
+
+  create(nom: string, categorie?: string): Observable<{ message: string; competence: Skill }> {
+    return this.http.post<{ message: string; competence: Skill }>(`${API_BASE_URL}/competences`, {
+      nom,
+      categorie,
+    });
+  }
 }

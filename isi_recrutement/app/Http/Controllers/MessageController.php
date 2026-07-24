@@ -16,6 +16,18 @@ class MessageController extends Controller
             'application_id'  => 'nullable|exists:applications,id',
         ]);
 
+        if ($request->user()->estCandidat()) {
+            $dejaContacte = Message::where('expediteur_id', $request->destinataire_id)
+                ->where('destinataire_id', $request->user()->id)
+                ->exists();
+
+            if (!$dejaContacte) {
+                return response()->json([
+                    'message' => "Vous ne pouvez pas initier une conversation. Attendez qu'un recruteur vous contacte d'abord.",
+                ], 403);
+            }
+        }
+
         $message = Message::create([
             'expediteur_id'   => $request->user()->id,
             'destinataire_id' => $request->destinataire_id,
@@ -50,6 +62,30 @@ class MessageController extends Controller
             ->update(['lu' => true, 'lu_le' => now()]);
 
         return response()->json($messages);
+    }
+
+    /** Liste des conversations de l'utilisateur courant, groupées par interlocuteur */
+    public function conversations(Request $request)
+    {
+        $moi = $request->user()->id;
+
+        $conversations = Message::where('expediteur_id', $moi)
+            ->orWhere('destinataire_id', $moi)
+            ->with('expediteur', 'destinataire')
+            ->orderByDesc('created_at')
+            ->get()
+            ->groupBy(fn ($m) => $m->expediteur_id === $moi ? $m->destinataire_id : $m->expediteur_id)
+            ->map(function ($messages) use ($moi) {
+                $dernier = $messages->first();
+                return [
+                    'utilisateur'     => $dernier->expediteur_id === $moi ? $dernier->destinataire : $dernier->expediteur,
+                    'dernier_message' => $dernier,
+                    'non_lus'         => $messages->where('destinataire_id', $moi)->where('lu', false)->count(),
+                ];
+            })
+            ->values();
+
+        return response()->json($conversations);
     }
 
     /** Nombre de messages non lus */

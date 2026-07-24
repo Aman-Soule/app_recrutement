@@ -37,6 +37,10 @@ export class Header implements OnInit {
     this.user()?.role === 'recruiter' ? 'Recruteur' : 'Candidat',
   );
 
+  irVersMessages(): void {
+    this.router.navigate(['/messages']);
+  }
+
   ngOnInit(): void {
     this.messageService.nonLus().subscribe({
       next: (res) => this.nonLus.set(res.non_lus),
@@ -44,9 +48,5 @@ export class Header implements OnInit {
         /* pas bloquant pour l'affichage de l'en-tête */
       },
     });
-  }
-
-  seDeconnecter(): void {
-    this.auth.logout().subscribe(() => this.router.navigate(['/login']));
   }
 }

@@ -79,7 +79,9 @@ class CompanyController extends Controller
     public function show(Company $company)
     {
         return response()->json(
-            $company->load('offres', 'recruteurs')
+            $company->load(['offres' => function ($q) {
+                $q->where('statut', 'actif')->latest('publie_le');
+            }, 'recruteurs'])
         );
     }
 }

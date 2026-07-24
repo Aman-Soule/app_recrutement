@@ -1,0 +1,67 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Compte et sécurité</h1>
+      <p>Modifiez vos informations personnelles ou votre mot de passe.</p>
+    </div>
+    <button class="btn btn-outline" type="button" (click)="retour()">Retour au profil</button>
+  </div>
+
+  @if (successMessage()) {
+    <div class="alert alert-success">{{ successMessage() }}</div>
+  }
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="tabs">
+    <button [class.active]="onglet() === 'infos'" (click)="changerOnglet('infos')">
+      Informations personnelles
+    </button>
+    <button [class.active]="onglet() === 'password'" (click)="changerOnglet('password')">
+      Mot de passe
+    </button>
+  </div>
+
+  @if (onglet() === 'infos') {
+    <div class="card">
+      <h2>Informations personnelles</h2>
+      <form [formGroup]="infosForm" (ngSubmit)="enregistrerInfos()">
+        <div class="field">
+          <label for="name">Nom complet</label>
+          <input id="name" type="text" formControlName="name" />
+        </div>
+        <div class="field">
+          <label for="email">Adresse email</label>
+          <input id="email" type="email" formControlName="email" />
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="infosForm.invalid || savingInfos()">
+          {{ savingInfos() ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </form>
+    </div>
+  } @else {
+    <div class="card">
+      <h2>Changer le mot de passe</h2>
+      <form [formGroup]="passwordForm" (ngSubmit)="enregistrerPassword()">
+        <div class="field">
+          <label for="current_password">Mot de passe actuel</label>
+          <input id="current_password" type="password" formControlName="current_password" />
+        </div>
+        <div class="field">
+          <label for="password">Nouveau mot de passe</label>
+          <input id="password" type="password" formControlName="password" />
+        </div>
+        <div class="field">
+          <label for="password_confirmation">Confirmer le nouveau mot de passe</label>
+          <input id="password_confirmation" type="password" formControlName="password_confirmation" />
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="passwordForm.invalid || savingPassword()">
+          {{ savingPassword() ? 'Enregistrement...' : 'Changer le mot de passe' }}
+        </button>
+      </form>
+    </div>
+  }
+</div>

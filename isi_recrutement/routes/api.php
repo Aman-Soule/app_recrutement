@@ -38,8 +38,10 @@ Route::post('/login',    [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
 
     // ---- Authentification ----
-    Route::get('/user',    [AuthController::class, 'user']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user',          [AuthController::class, 'user']);
+    Route::post('/logout',       [AuthController::class, 'logout']);
+    Route::put('/user',          [AuthController::class, 'updateAccount']);
+    Route::put('/user/password', [AuthController::class, 'updatePassword']);
 
     // ---- Compétences (tous les rôles) ----
     Route::get('/competences',  [SkillController::class, 'index']);
@@ -48,6 +50,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // ---- Offres d'emploi (lecture pour tous) ----
     Route::get('/offres',            [JobOfferController::class, 'index']);
     Route::get('/offres/{jobOffer}', [JobOfferController::class, 'show']);
+
+    // ---- Entreprise (lecture pour tous) ----
+    Route::get('/entreprises/{company}', [CompanyController::class, 'show']);
 
     /*
     |--------------------------------------------------------------------------
@@ -87,10 +92,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Vue d'ensemble recruteur (agrégats sur toutes ses offres)
         Route::get('/recruteur/candidatures', [ApplicationController::class, 'pourRecruteur']);
         Route::get('/recruteur/candidats',    [CandidateProfileController::class, 'pourRecruteur']);
+        Route::get('/recruteur/candidats/{candidateProfile}', [CandidateProfileController::class, 'voir']);
 
         // Entreprise
         Route::post('/entreprises',              [CompanyController::class, 'store']);
-        Route::get('/entreprises/{company}',     [CompanyController::class, 'show']);
         Route::put('/entreprises/{company}',     [CompanyController::class, 'update']);
         Route::post('/entreprises/{company}/logo', [CompanyController::class, 'uploadLogo']);
 
@@ -119,5 +124,6 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::post('/messages',                      [MessageController::class, 'store']);
     Route::get('/messages/non-lus',               [MessageController::class, 'nonLus']);
+    Route::get('/messages/conversations',         [MessageController::class, 'conversations']);
     Route::get('/messages/conversation/{userId}', [MessageController::class, 'conversation']);
 });

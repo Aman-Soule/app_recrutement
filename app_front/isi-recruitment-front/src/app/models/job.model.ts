@@ -29,3 +29,7 @@ export interface JobOffer {
   /** Présent uniquement sur /candidat/offres-recommandees */
   score_matching?: number;
 }
+
+export interface CompanyWithOffres extends Company {
+  offres?: JobOffer[];
+}

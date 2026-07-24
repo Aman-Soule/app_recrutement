@@ -4,11 +4,9 @@
       <h1>Paramètres</h1>
       <p>Gérez les informations de votre entreprise et votre profil.</p>
     </div>
+    <a class="btn btn-outline" routerLink="/account">Compte et sécurité</a>
   </div>
 
-  @if (successMessage()) {
-    <div class="alert alert-success">{{ successMessage() }}</div>
-  }
   @if (errorMessage()) {
     <div class="alert alert-error">{{ errorMessage() }}</div>
   }
@@ -50,49 +48,51 @@
     </div>
 
     <div class="card" style="margin-top: 20px">
-      <h2>Profil de l'entreprise</h2>
-      <form [formGroup]="companyForm" (ngSubmit)="enregistrerEntreprise()">
-        <div class="field-row">
-          <div class="field">
-            <label for="nom">Nom de l'entreprise</label>
-            <input id="nom" type="text" formControlName="nom" />
+      <div class="section-header">
+        <h2>Profil de l'entreprise</h2>
+        <a class="btn btn-outline btn-sm" routerLink="/recruiter/settings/company/edit">
+          {{ profil()?.entreprise ? 'Modifier' : 'Créer mon entreprise' }}
+        </a>
+      </div>
+
+      @if (profil()?.entreprise) {
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Nom de l'entreprise</span>
+            <span class="info-value">{{ profil()?.entreprise?.nom }}</span>
           </div>
-          <div class="field">
-            <label for="secteur">Secteur d'activité</label>
-            <input id="secteur" type="text" formControlName="secteur" />
+          <div class="info-item">
+            <span class="info-label">Secteur d'activité</span>
+            <span class="info-value">{{ profil()?.entreprise?.secteur || 'Non renseigné' }}</span>
+          </div>
+          <div class="info-item info-item--full">
+            <span class="info-label">Description</span>
+            <span class="info-value">{{ profil()?.entreprise?.description || 'Non renseignée' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Site web</span>
+            <span class="info-value">
+              @if (profil()?.entreprise?.site_web) {
+                <a [href]="profil()?.entreprise?.site_web" target="_blank" rel="noopener">{{ profil()?.entreprise?.site_web }}</a>
+              } @else {
+                Non renseigné
+              }
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Taille</span>
+            <span class="info-value">
+              {{ (profil()?.entreprise?.taille && libellesTaille[profil()!.entreprise!.taille!]) || 'Non précisée' }}
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Localisation</span>
+            <span class="info-value">{{ profil()?.entreprise?.localisation || 'Non renseignée' }}</span>
           </div>
         </div>
-
-        <div class="field">
-          <label for="description">Description</label>
-          <textarea id="description" rows="3" formControlName="description"></textarea>
-        </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label for="site_web">Site web</label>
-            <input id="site_web" type="url" formControlName="site_web" placeholder="https://..." />
-          </div>
-          <div class="field">
-            <label for="taille">Taille</label>
-            <select id="taille" formControlName="taille">
-              <option value="">Non précisée</option>
-              <option value="startup">Startup</option>
-              <option value="pme">PME</option>
-              <option value="grand_groupe">Grand groupe</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="localisation">Localisation</label>
-          <input id="localisation" type="text" formControlName="localisation" />
-        </div>
-
-        <button class="btn btn-primary" type="submit" [disabled]="savingCompany()">
-          {{ savingCompany() ? 'Enregistrement...' : 'Enregistrer les modifications' }}
-        </button>
-      </form>
+      } @else {
+        <p class="empty-state">Aucune entreprise renseignée pour le moment.</p>
+      }
     </div>
   } @else {
     <div class="card">
@@ -118,23 +118,21 @@
     </div>
 
     <div class="card" style="margin-top: 20px">
-      <h2>Mon profil recruteur</h2>
-      <form [formGroup]="profileForm" (ngSubmit)="enregistrerProfil()">
-        <div class="field-row">
-          <div class="field">
-            <label for="titre">Titre</label>
-            <input id="titre" type="text" formControlName="titre" placeholder="Ex : Senior Recruiter" />
-          </div>
-          <div class="field">
-            <label for="telephone">Téléphone</label>
-            <input id="telephone" type="text" formControlName="telephone" />
-          </div>
-        </div>
+      <div class="section-header">
+        <h2>Mon profil recruteur</h2>
+        <a class="btn btn-outline btn-sm" routerLink="/recruiter/settings/profile/edit">Modifier</a>
+      </div>
 
-        <button class="btn btn-primary" type="submit" [disabled]="savingProfile()">
-          {{ savingProfile() ? 'Enregistrement...' : 'Enregistrer' }}
-        </button>
-      </form>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Titre</span>
+          <span class="info-value">{{ profil()?.titre || 'Non renseigné' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Téléphone</span>
+          <span class="info-value">{{ profil()?.telephone || 'Non renseigné' }}</span>
+        </div>
+      </div>
     </div>
   }
 </div>

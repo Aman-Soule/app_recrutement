@@ -1,0 +1,147 @@
+<div class="page">
+  <a routerLink="/recruiter/candidates" class="back-link">← Retour aux candidats</a>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement du profil...</p>
+  } @else if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  } @else if (profil(); as profil) {
+    <div class="page-header">
+      <div>
+        <h1>{{ profil.utilisateur?.name }}</h1>
+        <p>{{ profil.titre || 'Titre non renseigné' }} · {{ profil.utilisateur?.email }}</p>
+      </div>
+      <a
+        class="btn btn-primary"
+        routerLink="/messages"
+        [queryParams]="{ with: profil.user_id }"
+      >
+        Contacter
+      </a>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="candidate-main">
+        <div class="card">
+          <div class="upload-row">
+            <div class="upload-block">
+              <div class="upload-avatar">
+                @if (profil.avatar_url) {
+                  <img [src]="profil.avatar_url" alt="" />
+                } @else {
+                  <span>{{ profil.utilisateur?.name?.[0] ?? '?' }}</span>
+                }
+              </div>
+              <div>
+                <span class="badge" [ngClass]="{
+                  'badge-success': profil.disponibilite === 'disponible',
+                  'badge-info': profil.disponibilite === 'a_lecoute',
+                  'badge-neutral': profil.disponibilite === 'non_disponible'
+                }">
+                  {{ libellesDisponibilite[profil.disponibilite] }}
+                </span>
+              </div>
+            </div>
+
+            @if (profil.cv_url) {
+              <div class="upload-block">
+                <div class="upload-cv-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+                    <path d="M14 3v5h5" />
+                  </svg>
+                </div>
+                <div>
+                  <a [href]="profil.cv_url" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
+                    Voir le CV
+                  </a>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px">
+          <h2>Informations générales</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Localisation</span>
+              <span class="info-value">{{ profil.localisation || 'Non renseignée' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Années d'expérience</span>
+              <span class="info-value">{{ profil.annees_experience }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Force du profil</span>
+              <span class="info-value">{{ profil.force_profil }}%</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Score d'employabilité</span>
+              <span class="info-value">{{ profil.score_employabilite }}%</span>
+            </div>
+            <div class="info-item info-item--full">
+              <span class="info-label">Biographie</span>
+              <span class="info-value">{{ profil.biographie || 'Non renseignée' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Portfolio</span>
+              <span class="info-value">
+                @if (profil.portfolio_url) {
+                  <a [href]="profil.portfolio_url" target="_blank" rel="noopener">{{ profil.portfolio_url }}</a>
+                } @else {
+                  Non renseigné
+                }
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">LinkedIn</span>
+              <span class="info-value">
+                @if (profil.linkedin_url) {
+                  <a [href]="profil.linkedin_url" target="_blank" rel="noopener">{{ profil.linkedin_url }}</a>
+                } @else {
+                  Non renseigné
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px">
+          <h2>Compétences</h2>
+          @if (competences().length) {
+            <div class="competences-selected">
+              @for (competence of competences(); track competence.id) {
+                <div class="competence-chip competence-chip--readonly">
+                  <span>{{ competence.nom }}</span>
+                  <span class="badge badge-info">{{ competence.niveau }}</span>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="empty-state">Aucune compétence renseignée.</p>
+          }
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Candidatures chez vous</h2>
+        @if (candidatures().length) {
+          @for (candidature of candidatures(); track candidature.id) {
+            <div class="interview-row">
+              <div>
+                <p class="interview-row__name">{{ candidature.offre?.titre }}</p>
+                <p class="interview-row__meta">{{ candidature.postule_le | date: 'dd/MM/yyyy' }}</p>
+              </div>
+              <span class="badge" [ngClass]="badgeClass(candidature.statut)">
+                {{ libelles[candidature.statut] }}
+              </span>
+            </div>
+          }
+        } @else {
+          <p class="empty-state">Aucune candidature pour l'instant.</p>
+        }
+      </div>
+    </div>
+  }
+</div>

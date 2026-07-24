@@ -1,0 +1,98 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Messages</h1>
+      <p>
+        @if (isRecruiter()) {
+          Échangez avec les candidats ayant postulé à vos offres.
+        } @else {
+          Vous pourrez répondre dès qu'un recruteur vous aura contacté.
+        }
+      </p>
+    </div>
+  </div>
+
+  <div class="messages-layout">
+    <aside class="card conversations-list">
+      @if (loadingConversations()) {
+        <p class="loading-state">Chargement...</p>
+      } @else if (conversations().length) {
+        @for (conversation of conversations(); track conversation.utilisateur.id) {
+          <button
+            type="button"
+            class="conversation-item"
+            [class.active]="selectedUserId() === conversation.utilisateur.id"
+            (click)="selectionner(conversation.utilisateur.id)"
+          >
+            <span class="conversation-item__avatar">{{ conversation.utilisateur.name[0] }}</span>
+            <span class="conversation-item__body">
+              <span class="conversation-item__name">{{ conversation.utilisateur.name }}</span>
+              <span class="conversation-item__preview">{{ conversation.dernier_message.contenu }}</span>
+            </span>
+            @if (conversation.non_lus > 0) {
+              <span class="conversation-item__badge">{{ conversation.non_lus }}</span>
+            }
+          </button>
+        }
+      } @else {
+        <p class="empty-state">Aucune conversation pour le moment.</p>
+      }
+    </aside>
+
+    <section class="card thread-panel">
+      @if (!selectedUserId()) {
+        <p class="empty-state">Sélectionnez une conversation pour afficher les messages.</p>
+      } @else {
+        <div class="thread-panel__header">
+          <span class="conversation-item__avatar">{{ selectedUserName()?.[0] }}</span>
+          <h2>{{ selectedUserName() }}</h2>
+        </div>
+
+        <div class="thread-panel__messages">
+          @if (loadingThread()) {
+            <p class="loading-state">Chargement...</p>
+          } @else if (messages().length) {
+            @for (message of messages(); track message.id) {
+              <div class="message-bubble" [class.mine]="message.expediteur_id === currentUserId()">
+                <p class="message-bubble__text">{{ message.contenu }}</p>
+                <span class="message-bubble__date">{{ message.created_at | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            }
+          } @else {
+            <p class="empty-state">Aucun message pour l'instant.</p>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-error">{{ errorMessage() }}</div>
+        }
+
+        @if (peutRepondre()) {
+          @if (isRecruiter()) {
+            <div class="template-row">
+              @for (template of templates; track template.label) {
+                <button type="button" class="btn btn-outline btn-sm" (click)="appliquerTemplate(template.texte)">
+                  {{ template.label }}
+                </button>
+              }
+            </div>
+          }
+
+          <div class="compose-row">
+            <textarea
+              rows="2"
+              placeholder="Écrivez votre message..."
+              [(ngModel)]="contenu"
+              (keydown.enter)="$event.preventDefault(); envoyer()"
+            ></textarea>
+            <button type="button" class="btn btn-primary" [disabled]="sending() || !contenu.trim()" (click)="envoyer()">
+              {{ sending() ? 'Envoi...' : 'Envoyer' }}
+            </button>
+          </div>
+        } @else {
+          <p class="empty-state">Vous pourrez répondre dès qu'un recruteur vous aura contacté.</p>
+        }
+      }
+    </section>
+  </div>
+</div>

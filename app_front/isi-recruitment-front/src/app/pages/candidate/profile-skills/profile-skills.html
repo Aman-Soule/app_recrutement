@@ -1,0 +1,92 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Modifier mes compétences</h1>
+      <p>Saisissez librement vos compétences ou choisissez-en dans la liste ci-dessous.</p>
+    </div>
+    <button class="btn btn-outline" type="button" (click)="annuler()">Annuler</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      @if (competencesSelectionnees().length) {
+        <div class="competences-selected">
+          @for (competence of competencesSelectionnees(); track competence.id) {
+            <div class="competence-chip">
+              <span>{{ competence.nom }}</span>
+              <select
+                [ngModel]="competence.niveau"
+                (ngModelChange)="changerNiveau(competence.id, $event)"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                @for (niveau of niveaux; track niveau) {
+                  <option [value]="niveau">{{ niveau }}</option>
+                }
+              </select>
+              <button
+                type="button"
+                class="competence-chip__remove"
+                (click)="toggleCompetence(competence.id)"
+                aria-label="Retirer cette compétence"
+              >
+                ×
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="competence-search">
+        <input
+          type="text"
+          placeholder="Ex : Kubernetes, Négociation, Photoshop..."
+          [(ngModel)]="nouvelleCompetence"
+          [ngModelOptions]="{ standalone: true }"
+          (keyup.enter)="ajouterCompetence()"
+        />
+        <button
+          class="btn btn-outline"
+          type="button"
+          (click)="ajouterCompetence()"
+          [disabled]="!nouvelleCompetence.trim() || ajoutCompetenceEnCours()"
+        >
+          {{ ajoutCompetenceEnCours() ? 'Ajout...' : 'Ajouter' }}
+        </button>
+      </div>
+
+      @if (suggestionsCompetences().length) {
+        <div class="competence-suggestions">
+          @for (suggestion of suggestionsCompetences(); track suggestion.id) {
+            <button type="button" class="chip" (click)="selectionnerSuggestion(suggestion)">
+              {{ suggestion.nom }}
+            </button>
+          }
+        </div>
+      }
+
+      <p class="section-label" style="margin-top: 20px">Ou choisissez parmi les compétences existantes</p>
+      <div class="competences-grid">
+        @for (competence of toutesCompetences(); track competence.id) {
+          <label class="checkbox-field competence-row" [class.active]="estSelectionnee(competence.id)">
+            <input
+              type="checkbox"
+              [checked]="estSelectionnee(competence.id)"
+              (change)="toggleCompetence(competence.id)"
+            />
+            {{ competence.nom }}
+          </label>
+        }
+      </div>
+
+      <button class="btn btn-primary" type="button" (click)="enregistrer()" [disabled]="saving()">
+        {{ saving() ? 'Enregistrement...' : 'Enregistrer les compétences' }}
+      </button>
+    </div>
+  }
+</div>

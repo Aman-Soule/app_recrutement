@@ -39,6 +39,12 @@
   margin-top: 2px;
 }
 
+.modal-panel__actions {
+  display: flex;
+  gap: 8px;
+  padding: 14px 24px 0;
+}
+
 .modal-panel__close {
   border: none;
   background: none;

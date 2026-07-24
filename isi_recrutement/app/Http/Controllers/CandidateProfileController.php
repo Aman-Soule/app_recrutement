@@ -31,6 +31,37 @@ class CandidateProfileController extends Controller
         return response()->json($profils);
     }
 
+    /** Recruteur : voir le détail complet d'un candidat ayant postulé à l'une de ses offres */
+    public function voir(Request $request, CandidateProfile $candidateProfile)
+    {
+        $recruteur = $request->user()->profilRecruteur;
+
+        $estCandidatDuRecruteur = $candidateProfile->candidatures()
+            ->whereHas('offre', function ($q) use ($recruteur) {
+                $q->where('recruiter_profile_id', $recruteur->id);
+            })
+            ->exists();
+
+        if (!$estCandidatDuRecruteur) {
+            abort(403, "Vous n'avez pas accès à ce profil candidat.");
+        }
+
+        $candidateProfile->load('utilisateur', 'competences');
+
+        $candidatures = $candidateProfile->candidatures()
+            ->whereHas('offre', function ($q) use ($recruteur) {
+                $q->where('recruiter_profile_id', $recruteur->id);
+            })
+            ->with('offre', 'entretiens')
+            ->latest('postule_le')
+            ->get();
+
+        return response()->json([
+            'profil'      => $candidateProfile,
+            'candidatures' => $candidatures,
+        ]);
+    }
+
     /** Voir son propre profil candidat */
     public function show(Request $request)
     {

@@ -34,6 +34,20 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/candidate/jobs/jobs').then((m) => m.Jobs),
       },
       {
+        path: 'candidate/jobs/:id',
+        canActivate: [roleGuard],
+        data: { role: 'candidate' },
+        loadComponent: () =>
+          import('./pages/candidate/job-detail/job-detail').then((m) => m.JobDetail),
+      },
+      {
+        path: 'candidate/companies/:id',
+        canActivate: [roleGuard],
+        data: { role: 'candidate' },
+        loadComponent: () =>
+          import('./pages/candidate/company-detail/company-detail').then((m) => m.CompanyDetail),
+      },
+      {
         path: 'candidate/applications',
         canActivate: [roleGuard],
         data: { role: 'candidate' },
@@ -45,6 +59,20 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { role: 'candidate' },
         loadComponent: () => import('./pages/candidate/profile/profile').then((m) => m.Profile),
+      },
+      {
+        path: 'candidate/profile/edit',
+        canActivate: [roleGuard],
+        data: { role: 'candidate' },
+        loadComponent: () =>
+          import('./pages/candidate/profile-edit/profile-edit').then((m) => m.ProfileEdit),
+      },
+      {
+        path: 'candidate/profile/skills',
+        canActivate: [roleGuard],
+        data: { role: 'candidate' },
+        loadComponent: () =>
+          import('./pages/candidate/profile-skills/profile-skills').then((m) => m.ProfileSkills),
       },
 
       // Espace recruteur
@@ -69,6 +97,13 @@ export const routes: Routes = [
           import('./pages/recruiter/candidates/candidates').then((m) => m.Candidates),
       },
       {
+        path: 'recruiter/candidates/:id',
+        canActivate: [roleGuard],
+        data: { role: 'recruiter' },
+        loadComponent: () =>
+          import('./pages/recruiter/candidate-detail/candidate-detail').then((m) => m.CandidateDetail),
+      },
+      {
         path: 'recruiter/interviews',
         canActivate: [roleGuard],
         data: { role: 'recruiter' },
@@ -87,6 +122,30 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { role: 'recruiter' },
         loadComponent: () => import('./pages/recruiter/settings/settings').then((m) => m.Settings),
+      },
+      {
+        path: 'recruiter/settings/company/edit',
+        canActivate: [roleGuard],
+        data: { role: 'recruiter' },
+        loadComponent: () =>
+          import('./pages/recruiter/company-edit/company-edit').then((m) => m.CompanyEdit),
+      },
+      {
+        path: 'recruiter/settings/profile/edit',
+        canActivate: [roleGuard],
+        data: { role: 'recruiter' },
+        loadComponent: () =>
+          import('./pages/recruiter/profile-edit/profile-edit').then((m) => m.ProfileEdit),
+      },
+
+      // Compte (accessible aux deux rôles)
+      {
+        path: 'account',
+        loadComponent: () => import('./pages/shared/account/account').then((m) => m.Account),
+      },
+      {
+        path: 'messages',
+        loadComponent: () => import('./pages/shared/messages/messages').then((m) => m.Messages),
       },
 
       // Redirection par défaut (le roleGuard rebascule vers le bon dashboard si besoin)

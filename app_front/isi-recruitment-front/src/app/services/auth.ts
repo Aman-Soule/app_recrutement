@@ -71,6 +71,23 @@ export class AuthService {
     );
   }
 
+  updateAccount(payload: { name: string; email: string }): Observable<{ user: User }> {
+    return this.http.put<{ user: User }>(`${API_BASE_URL}/user`, payload).pipe(
+      tap((res) => {
+        this.currentUser.set(res.user);
+        if (this.isBrowser) localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+      }),
+    );
+  }
+
+  updatePassword(payload: {
+    current_password: string;
+    password: string;
+    password_confirmation: string;
+  }): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${API_BASE_URL}/user/password`, payload);
+  }
+
   getToken(): string | null {
     return this.isBrowser ? localStorage.getItem(TOKEN_KEY) : null;
   }

@@ -1,0 +1,67 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--gray-700);
+}
+
+.job-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.job-text {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.apply-card h2 {
+  margin-bottom: 12px;
+}
+
+.company-card h2 {
+  margin-bottom: 12px;
+}
+
+.company-name {
+  font-weight: 700;
+  color: var(--gray-900);
+  font-size: 1.05rem;
+}
+
+.company-card .job-row__meta {
+  margin-top: 8px;
+}
+
+.company-card .job-text {
+  margin-top: 8px;
+}
+
+.company-card a.job-row__meta {
+  display: block;
+  color: var(--primary);
+  text-decoration: none;
+}

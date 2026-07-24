@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
+import { Router } from '@angular/router';
 import { CandidateProfileService } from '../../../services/candidate-profile.service';
 import { CandidateProfile, Disponibilite } from '../../../models/user.model';
 
@@ -20,6 +21,7 @@ const COLONNES_KANBAN: { disponibilite: Disponibilite; label: string }[] = [
 })
 export class Candidates implements OnInit {
   private candidateProfileService = inject(CandidateProfileService);
+  private router = inject(Router);
 
   readonly candidats = signal<CandidateProfile[]>([]);
   readonly loading = signal(true);
@@ -65,6 +67,10 @@ export class Candidates implements OnInit {
 
   pagePrecedente(): void {
     if (this.currentPage() > 1) this.charger(this.currentPage() - 1);
+  }
+
+  voirDetail(candidatId: number): void {
+    this.router.navigate(['/recruiter/candidates', candidatId]);
   }
 
   badgeClass(disponibilite: Disponibilite): string {

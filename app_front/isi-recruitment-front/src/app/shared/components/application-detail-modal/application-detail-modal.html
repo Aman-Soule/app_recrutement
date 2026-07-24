@@ -14,6 +14,25 @@
       <button type="button" class="modal-panel__close" (click)="close.emit()">&times;</button>
     </div>
 
+    @if (role === 'recruiter') {
+      <div class="modal-panel__actions">
+        <a class="btn btn-outline btn-sm" [routerLink]="['/recruiter/candidates', application.candidat?.id]">
+          Voir le profil complet
+        </a>
+        <a
+          class="btn btn-outline btn-sm"
+          routerLink="/messages"
+          [queryParams]="{
+            with: application.candidat?.user_id,
+            application: application.id,
+            withName: application.candidat?.utilisateur?.name
+          }"
+        >
+          Contacter
+        </a>
+      </div>
+    }
+
     <div class="modal-panel__body">
       <div class="detail-grid">
         <div class="detail-item">

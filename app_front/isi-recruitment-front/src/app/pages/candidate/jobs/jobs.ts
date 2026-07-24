@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { JobService } from '../../../services/job.service';
 import { ApplicationService } from '../../../services/application.service';
 import { JobOffer } from '../../../models/job.model';
@@ -7,7 +8,7 @@ import { Application } from '../../../models/application.model';
 
 @Component({
   selector: 'app-jobs',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './jobs.html',
   styleUrl: './jobs.scss',
 })
@@ -18,7 +19,6 @@ export class Jobs implements OnInit {
   readonly offres = signal<JobOffer[]>([]);
   readonly candidatures = signal<Application[]>([]);
   readonly loading = signal(true);
-  readonly postulationEnCours = signal<number | null>(null);
   readonly currentPage = signal(1);
   readonly lastPage = signal(1);
 
@@ -57,17 +57,6 @@ export class Jobs implements OnInit {
 
   dejaPostule(offreId: number): boolean {
     return this.candidatures().some((c) => c.job_offer_id === offreId);
-  }
-
-  postuler(offre: JobOffer): void {
-    this.postulationEnCours.set(offre.id);
-    this.applicationService.postuler(offre.id).subscribe({
-      next: (res) => {
-        this.candidatures.update((c) => [...c, res.candidature]);
-        this.postulationEnCours.set(null);
-      },
-      error: () => this.postulationEnCours.set(null),
-    });
   }
 
   pageSuivante(): void {

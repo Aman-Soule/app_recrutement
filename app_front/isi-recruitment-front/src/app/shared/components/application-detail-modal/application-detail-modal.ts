@@ -1,6 +1,7 @@
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ApplicationService } from '../../../services/application.service';
 import {
   Application,
@@ -16,7 +17,7 @@ export type DetailModalRole = 'candidate' | 'recruiter';
 
 @Component({
   selector: 'app-application-detail-modal',
-  imports: [DatePipe, NgClass, FormsModule],
+  imports: [DatePipe, NgClass, FormsModule, RouterLink],
   templateUrl: './application-detail-modal.html',
   styleUrl: './application-detail-modal.scss',
 })
