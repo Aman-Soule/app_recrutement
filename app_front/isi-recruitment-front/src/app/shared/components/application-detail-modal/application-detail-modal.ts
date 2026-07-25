@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApplicationService } from '../../../services/application.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import {
   Application,
   LIBELLES_STATUT_CANDIDATURE,
@@ -23,6 +24,7 @@ export type DetailModalRole = 'candidate' | 'recruiter';
 })
 export class ApplicationDetailModal implements OnInit {
   private applicationService = inject(ApplicationService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   @Input({ required: true }) application!: Application;
   @Input() role: DetailModalRole = 'candidate';
@@ -60,7 +62,18 @@ export class ApplicationDetailModal implements OnInit {
     }
   }
 
-  enregistrerStatut(): void {
+  async enregistrerStatut(): Promise<void> {
+    const estDecisionForte = this.statutForm === 'rejete' || this.statutForm === 'embauche';
+    const ok = await this.confirmDialog.confirm({
+      title: 'Changer le statut de la candidature',
+      message: estDecisionForte
+        ? `Confirmer le passage de cette candidature au statut "${this.libelles[this.statutForm]}" ? Le candidat sera notifié par e-mail et cette décision est difficile à revenir dessus.`
+        : `Confirmer le passage de cette candidature au statut "${this.libelles[this.statutForm]}" ? Le candidat sera notifié par e-mail.`,
+      confirmLabel: 'Confirmer',
+      danger: estDecisionForte,
+    });
+    if (!ok) return;
+
     this.saving.set(true);
     this.error.set(null);
     this.applicationService

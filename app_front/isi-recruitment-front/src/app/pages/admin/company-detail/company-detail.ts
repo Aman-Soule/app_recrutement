@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AdminCompanyService } from '../../../services/admin-company.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { Company, RecruiterProfile } from '../../../models/user.model';
 
 type CompanyWithRecruiters = Company & { recruteurs: RecruiterProfile[] };
@@ -13,6 +14,7 @@ type CompanyWithRecruiters = Company & { recruteurs: RecruiterProfile[] };
 })
 export class CompanyDetail implements OnInit {
   private companyService = inject(AdminCompanyService);
+  private confirmDialog = inject(ConfirmDialogService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -30,12 +32,18 @@ export class CompanyDetail implements OnInit {
     });
   }
 
-  supprimer(): void {
+  async supprimer(): Promise<void> {
     const entreprise = this.entreprise();
     if (!entreprise) return;
-    if (!confirm(`Supprimer l'entreprise "${entreprise.nom}" ? Ses offres d'emploi seront aussi supprimées.`)) {
-      return;
-    }
+
+    const ok = await this.confirmDialog.confirm({
+      title: "Supprimer l'entreprise",
+      message: `Supprimer l'entreprise "${entreprise.nom}" ? Ses offres d'emploi seront aussi supprimées. Cette action est irréversible.`,
+      confirmLabel: 'Supprimer',
+      danger: true,
+    });
+    if (!ok) return;
+
     this.companyService.delete(entreprise.id).subscribe({
       next: () => this.router.navigate(['/admin/companies']),
       error: () => {},

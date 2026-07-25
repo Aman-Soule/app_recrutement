@@ -2,6 +2,7 @@ import { DatePipe, NgClass } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { JobService } from '../../../services/job.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { JobOffer, StatutOffre } from '../../../models/job.model';
 import { extractErrorMessage } from '../../../services/api';
 
@@ -23,6 +24,7 @@ const COLONNES_KANBAN: { statut: StatutOffre; label: string }[] = [
 export class Jobs implements OnInit {
   private fb = inject(FormBuilder);
   private jobService = inject(JobService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   readonly offres = signal<JobOffer[]>([]);
   readonly loading = signal(true);
@@ -113,11 +115,20 @@ export class Jobs implements OnInit {
     this.errorMessage.set(null);
   }
 
-  enregistrer(): void {
+  async enregistrer(): Promise<void> {
+    const id = this.editingId();
+
+    if (id) {
+      const ok = await this.confirmDialog.confirm({
+        message: 'Confirmer la modification de cette offre ?',
+        confirmLabel: 'Modifier',
+      });
+      if (!ok) return;
+    }
+
     this.saving.set(true);
     this.errorMessage.set(null);
     const payload = this.form.getRawValue() as Partial<JobOffer> & { statut: StatutOffre };
-    const id = this.editingId();
 
     const requete = id ? this.jobService.update(id, payload) : this.jobService.create(payload);
 
@@ -134,8 +145,15 @@ export class Jobs implements OnInit {
     });
   }
 
-  supprimer(offre: JobOffer): void {
-    if (!confirm(`Supprimer l'offre "${offre.titre}" ?`)) return;
+  async supprimer(offre: JobOffer): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: "Supprimer l'offre",
+      message: `Supprimer l'offre "${offre.titre}" ? Cette action est irréversible.`,
+      confirmLabel: 'Supprimer',
+      danger: true,
+    });
+    if (!ok) return;
+
     this.jobService.delete(offre.id).subscribe(() => this.charger());
   }
 

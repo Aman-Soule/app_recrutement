@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RecruiterProfileService } from '../../../services/recruiter-profile.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { extractErrorMessage } from '../../../services/api';
 
 @Component({
@@ -13,6 +14,7 @@ import { extractErrorMessage } from '../../../services/api';
 export class ProfileEdit implements OnInit {
   private fb = inject(FormBuilder);
   private recruiterProfileService = inject(RecruiterProfileService);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
 
   readonly loading = signal(true);
@@ -38,7 +40,13 @@ export class ProfileEdit implements OnInit {
     this.router.navigate(['/recruiter/settings']);
   }
 
-  enregistrer(): void {
+  async enregistrer(): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      message: 'Confirmer la modification de votre profil recruteur ?',
+      confirmLabel: 'Enregistrer',
+    });
+    if (!ok) return;
+
     this.saving.set(true);
     this.errorMessage.set(null);
 

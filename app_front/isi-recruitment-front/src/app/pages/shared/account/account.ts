@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { extractErrorMessage } from '../../../services/api';
 
 @Component({
@@ -13,6 +14,7 @@ import { extractErrorMessage } from '../../../services/api';
 export class Account {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
 
   readonly onglet = signal<'infos' | 'password'>('infos');
@@ -51,7 +53,13 @@ export class Account {
     return this.authService.role() === 'recruiter' ? '/recruiter/settings' : '/candidate/profile';
   }
 
-  enregistrerInfos(): void {
+  async enregistrerInfos(): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      message: 'Confirmer la modification de vos informations personnelles ?',
+      confirmLabel: 'Enregistrer',
+    });
+    if (!ok) return;
+
     this.savingInfos.set(true);
     this.successMessage.set(null);
     this.errorMessage.set(null);
@@ -68,7 +76,15 @@ export class Account {
     });
   }
 
-  enregistrerPassword(): void {
+  async enregistrerPassword(): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: 'Changer de mot de passe',
+      message: 'Confirmer le changement de votre mot de passe ? Vous devrez utiliser le nouveau mot de passe lors de votre prochaine connexion.',
+      confirmLabel: 'Changer le mot de passe',
+      danger: true,
+    });
+    if (!ok) return;
+
     this.savingPassword.set(true);
     this.successMessage.set(null);
     this.errorMessage.set(null);

@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CandidateProfileService } from '../../../services/candidate-profile.service';
 import { AuthService } from '../../../services/auth';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { CandidateProfile, NiveauCompetence, Skill } from '../../../models/user.model';
 import { extractErrorMessage } from '../../../services/api';
 
@@ -14,6 +15,7 @@ import { extractErrorMessage } from '../../../services/api';
 export class Profile implements OnInit {
   private candidateProfileService = inject(CandidateProfileService);
   private authService = inject(AuthService);
+  private confirmDialog = inject(ConfirmDialogService);
   readonly currentUser = this.authService.currentUser;
 
   readonly loading = signal(true);
@@ -56,9 +58,15 @@ export class Profile implements OnInit {
     });
   }
 
-  surAvatarSelectionne(event: Event): void {
+  async surAvatarSelectionne(event: Event): Promise<void> {
     const fichier = (event.target as HTMLInputElement).files?.[0];
     if (!fichier) return;
+
+    const ok = await this.confirmDialog.confirm({
+      message: 'Remplacer votre photo de profil actuelle par cette image ?',
+      confirmLabel: 'Remplacer',
+    });
+    if (!ok) return;
 
     this.uploadingAvatar.set(true);
     this.errorMessage.set(null);
@@ -75,9 +83,15 @@ export class Profile implements OnInit {
     });
   }
 
-  surCvSelectionne(event: Event): void {
+  async surCvSelectionne(event: Event): Promise<void> {
     const fichier = (event.target as HTMLInputElement).files?.[0];
     if (!fichier) return;
+
+    const ok = await this.confirmDialog.confirm({
+      message: 'Remplacer votre CV actuel par ce fichier ?',
+      confirmLabel: 'Remplacer',
+    });
+    if (!ok) return;
 
     this.uploadingCv.set(true);
     this.errorMessage.set(null);

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CandidateProfileService } from '../../../services/candidate-profile.service';
 import { SkillService } from '../../../services/skill.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { NiveauCompetence, Skill } from '../../../models/user.model';
 import { extractErrorMessage } from '../../../services/api';
 
@@ -20,6 +21,7 @@ interface CompetenceSelection {
 export class ProfileSkills implements OnInit {
   private candidateProfileService = inject(CandidateProfileService);
   private skillService = inject(SkillService);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
 
   readonly loading = signal(true);
@@ -145,7 +147,13 @@ export class ProfileSkills implements OnInit {
     });
   }
 
-  enregistrer(): void {
+  async enregistrer(): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      message: 'Confirmer la mise à jour de vos compétences ?',
+      confirmLabel: 'Enregistrer',
+    });
+    if (!ok) return;
+
     this.saving.set(true);
     this.errorMessage.set(null);
 

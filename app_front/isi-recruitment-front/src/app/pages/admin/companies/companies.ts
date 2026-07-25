@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AdminCompanyService } from '../../../services/admin-company.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { Company } from '../../../models/user.model';
 
 type CompanyRow = Company & { recruteurs_count?: number; offres_count?: number };
@@ -14,6 +15,7 @@ type CompanyRow = Company & { recruteurs_count?: number; offres_count?: number }
 })
 export class Companies implements OnInit {
   private companyService = inject(AdminCompanyService);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
 
   readonly entreprises = signal<CompanyRow[]>([]);
@@ -51,11 +53,16 @@ export class Companies implements OnInit {
     this.router.navigate(['/admin/companies', id]);
   }
 
-  supprimer(entreprise: CompanyRow, event: Event): void {
+  async supprimer(entreprise: CompanyRow, event: Event): Promise<void> {
     event.stopPropagation();
-    if (!confirm(`Supprimer l'entreprise "${entreprise.nom}" ? Ses offres d'emploi seront aussi supprimées.`)) {
-      return;
-    }
+    const ok = await this.confirmDialog.confirm({
+      title: "Supprimer l'entreprise",
+      message: `Supprimer l'entreprise "${entreprise.nom}" ? Ses offres d'emploi seront aussi supprimées. Cette action est irréversible.`,
+      confirmLabel: 'Supprimer',
+      danger: true,
+    });
+    if (!ok) return;
+
     this.companyService.delete(entreprise.id).subscribe({
       next: () => this.charger(this.currentPage()),
       error: () => {},

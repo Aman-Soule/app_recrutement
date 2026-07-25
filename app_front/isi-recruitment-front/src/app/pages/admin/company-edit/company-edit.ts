@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AdminCompanyService } from '../../../services/admin-company.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { Company } from '../../../models/user.model';
 import { extractErrorMessage } from '../../../services/api';
 
@@ -14,6 +15,7 @@ import { extractErrorMessage } from '../../../services/api';
 export class CompanyEdit implements OnInit {
   private fb = inject(FormBuilder);
   private companyService = inject(AdminCompanyService);
+  private confirmDialog = inject(ConfirmDialogService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -59,7 +61,15 @@ export class CompanyEdit implements OnInit {
     this.router.navigate(['/admin/companies']);
   }
 
-  enregistrer(): void {
+  async enregistrer(): Promise<void> {
+    if (this.companyId) {
+      const ok = await this.confirmDialog.confirm({
+        message: "Confirmer la modification des informations de l'entreprise ?",
+        confirmLabel: 'Enregistrer',
+      });
+      if (!ok) return;
+    }
+
     this.saving.set(true);
     this.errorMessage.set(null);
     const raw = this.form.getRawValue();

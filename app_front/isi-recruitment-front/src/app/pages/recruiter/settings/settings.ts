@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { RecruiterProfileService } from '../../../services/recruiter-profile.service';
 import { CompanyService } from '../../../services/company.service';
 import { AuthService } from '../../../services/auth';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { RecruiterProfile } from '../../../models/user.model';
 import { extractErrorMessage } from '../../../services/api';
 
@@ -16,6 +17,7 @@ export class Settings implements OnInit {
   private recruiterProfileService = inject(RecruiterProfileService);
   private companyService = inject(CompanyService);
   private authService = inject(AuthService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   readonly onglet = signal<'entreprise' | 'profil'>('entreprise');
   readonly loading = signal(true);
@@ -44,10 +46,16 @@ export class Settings implements OnInit {
     this.onglet.set(onglet);
   }
 
-  surLogoSelectionne(event: Event): void {
+  async surLogoSelectionne(event: Event): Promise<void> {
     const fichier = (event.target as HTMLInputElement).files?.[0];
     const companyId = this.profil()?.entreprise?.id;
     if (!fichier || !companyId) return;
+
+    const ok = await this.confirmDialog.confirm({
+      message: "Remplacer le logo actuel de l'entreprise par cette image ?",
+      confirmLabel: 'Remplacer',
+    });
+    if (!ok) return;
 
     this.uploadingLogo.set(true);
     this.errorMessage.set(null);
@@ -63,9 +71,15 @@ export class Settings implements OnInit {
     });
   }
 
-  surAvatarSelectionne(event: Event): void {
+  async surAvatarSelectionne(event: Event): Promise<void> {
     const fichier = (event.target as HTMLInputElement).files?.[0];
     if (!fichier) return;
+
+    const ok = await this.confirmDialog.confirm({
+      message: 'Remplacer votre photo de profil actuelle par cette image ?',
+      confirmLabel: 'Remplacer',
+    });
+    if (!ok) return;
 
     this.uploadingAvatar.set(true);
     this.errorMessage.set(null);

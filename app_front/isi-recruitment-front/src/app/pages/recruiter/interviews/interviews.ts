@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { InterviewService } from '../../../services/interview.service';
 import { ApplicationService } from '../../../services/application.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import {
   Interview,
   LIBELLES_ETAPE_ENTRETIEN,
@@ -21,6 +22,7 @@ export class Interviews implements OnInit {
   private fb = inject(FormBuilder);
   private interviewService = inject(InterviewService);
   private applicationService = inject(ApplicationService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   readonly entretiens = signal<Interview[]>([]);
   readonly candidatures = signal<Application[]>([]);
@@ -135,11 +137,24 @@ export class Interviews implements OnInit {
     this.feedbackTarget.set(null);
   }
 
-  enregistrerFeedback(): void {
+  async enregistrerFeedback(): Promise<void> {
     const cible = this.feedbackTarget();
     if (!cible) return;
 
     const valeurs = this.feedbackForm.getRawValue();
+    const annulation = valeurs.statut === 'annule';
+
+    const ok = await this.confirmDialog.confirm({
+      title: annulation ? "Annuler l'entretien" : "Enregistrer le feedback",
+      message: annulation
+        ? "Annuler cet entretien ? Cette action est difficile à revenir dessus."
+        : 'Confirmer l\'enregistrement de ce feedback ?',
+      confirmLabel: annulation ? "Annuler l'entretien" : 'Enregistrer',
+      cancelLabel: annulation ? 'Retour' : 'Annuler',
+      danger: annulation,
+    });
+    if (!ok) return;
+
     this.interviewService
       .feedback(cible.id, {
         note: valeurs.note,

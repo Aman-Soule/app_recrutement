@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { LayoutUiService } from '../../services/layout-ui.service';
+import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 
 interface NavItem {
   label: string;
@@ -42,6 +43,7 @@ const NAV_ADMIN: NavItem[] = [
 export class Sidebar {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private confirmDialog = inject(ConfirmDialogService);
   readonly layoutUi = inject(LayoutUiService);
 
   readonly navItems = computed<NavItem[]>(() => {
@@ -51,7 +53,14 @@ export class Sidebar {
     return NAV_CANDIDAT;
   });
 
-  seDeconnecter(): void {
+  async seDeconnecter(): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: 'Déconnexion',
+      message: 'Voulez-vous vraiment vous déconnecter ?',
+      confirmLabel: 'Se déconnecter',
+    });
+    if (!ok) return;
+
     this.auth.logout().subscribe(() => this.router.navigate(['/login']));
   }
 }

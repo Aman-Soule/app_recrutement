@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { JobService } from '../../../services/job.service';
 import { ApplicationService } from '../../../services/application.service';
 import { CandidateProfileService } from '../../../services/candidate-profile.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { JobOffer } from '../../../models/job.model';
 import { Application } from '../../../models/application.model';
 import { CandidateProfile } from '../../../models/user.model';
@@ -19,6 +20,7 @@ export class JobDetail implements OnInit {
   private jobService = inject(JobService);
   private applicationService = inject(ApplicationService);
   private candidateProfileService = inject(CandidateProfileService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   readonly offre = signal<JobOffer | null>(null);
   readonly profil = signal<CandidateProfile | null>(null);
@@ -56,9 +58,16 @@ export class JobDetail implements OnInit {
     });
   }
 
-  postuler(): void {
+  async postuler(): Promise<void> {
     const offre = this.offre();
     if (!offre) return;
+
+    const ok = await this.confirmDialog.confirm({
+      title: 'Envoyer ma candidature',
+      message: `Confirmer l'envoi de votre candidature pour "${offre.titre}" ? Vous ne pourrez pas la retirer une fois envoyée.`,
+      confirmLabel: 'Envoyer ma candidature',
+    });
+    if (!ok) return;
 
     this.postulation.set(true);
     this.erreur.set('');
