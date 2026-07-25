@@ -5,7 +5,7 @@
       <span>TalentAI</span>
     </div>
     <h1>Rejoignez TalentAI dès aujourd'hui.</h1>
-    <p>Créez votre compte candidat ou recruteur et commencez en quelques minutes.</p>
+    <p>Créez votre compte candidat et commencez en quelques minutes.</p>
   </div>
 
   <div class="auth__panel">
@@ -18,20 +18,6 @@
       }
 
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <div class="field">
-          <label>Je suis</label>
-          <div class="role-toggle">
-            <label class="role-option" [class.active]="form.value.role === 'candidate'">
-              <input type="radio" formControlName="role" value="candidate" />
-              Candidat
-            </label>
-            <label class="role-option" [class.active]="form.value.role === 'recruiter'">
-              <input type="radio" formControlName="role" value="recruiter" />
-              Recruteur
-            </label>
-          </div>
-        </div>
-
         <div class="field">
           <label for="name">Nom complet</label>
           <input id="name" type="text" formControlName="name" placeholder="Jean Dupont" />

@@ -1,0 +1,55 @@
+@if (loading()) {
+  <div class="page">
+    <p class="loading-state">Chargement...</p>
+  </div>
+} @else if (entreprise(); as e) {
+  <div class="page">
+    <div class="page-header">
+      <div>
+        <h1>{{ e.nom }}</h1>
+        <p>{{ e.secteur || 'Secteur non renseigné' }} · {{ e.localisation || 'Localisation non renseignée' }}</p>
+      </div>
+      <div class="actions">
+        <a [routerLink]="['/admin/companies', e.id, 'edit']" class="btn btn-outline">Modifier</a>
+        <button class="btn btn-outline" (click)="supprimer()">Supprimer</button>
+      </div>
+    </div>
+
+    @if (e.description) {
+      <div class="card" style="margin-bottom: 20px">
+        <h2>Description</h2>
+        <p>{{ e.description }}</p>
+      </div>
+    }
+
+    <div class="card">
+      <h2>Recruteurs ({{ e.recruteurs.length }})</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Titre</th>
+              <th>Téléphone</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (recruteur of e.recruteurs; track recruteur.id) {
+              <tr>
+                <td>{{ recruteur.utilisateur?.name }}</td>
+                <td>{{ recruteur.utilisateur?.email }}</td>
+                <td>{{ recruteur.titre || '—' }}</td>
+                <td>{{ recruteur.telephone || '—' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-state">Aucun recruteur rattaché à cette entreprise.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}

@@ -37,9 +37,13 @@ export class Login {
     this.auth.login(email, password).subscribe({
       next: (res) => {
         this.loading.set(false);
-        this.router.navigate([
-          res.role === 'recruiter' ? '/recruiter/dashboard' : '/candidate/dashboard',
-        ]);
+        const destination =
+          res.role === 'admin'
+            ? '/admin/dashboard'
+            : res.role === 'recruiter'
+              ? '/recruiter/dashboard'
+              : '/candidate/dashboard';
+        this.router.navigate([destination]);
       },
       error: (err) => {
         this.loading.set(false);

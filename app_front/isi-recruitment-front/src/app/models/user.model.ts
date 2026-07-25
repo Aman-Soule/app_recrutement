@@ -71,3 +71,13 @@ export interface User {
   profil_candidat?: CandidateProfile;
   profil_recruteur?: RecruiterProfile;
 }
+
+export interface AdminStats {
+  entreprises: number;
+  recruteurs: number;
+  candidats: number;
+  offres_actives: number;
+  candidatures: number;
+  embauches: number;
+  company_id: number | null;
+}

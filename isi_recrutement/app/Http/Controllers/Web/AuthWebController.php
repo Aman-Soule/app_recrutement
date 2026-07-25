@@ -60,32 +60,26 @@ class AuthWebController extends Controller
         $request->validate([
             'name'                  => 'required|string|max:255',
             'email'                 => 'required|email|unique:users,email',
-            'role'                  => 'required|in:candidate,recruiter',
             'password'              => 'required|string|min:8|confirmed',
         ], [
             'name.required'         => 'Le nom est obligatoire.',
             'email.required'        => 'L\'adresse e-mail est obligatoire.',
             'email.unique'          => 'Cet e-mail est déjà utilisé.',
-            'role.required'         => 'Veuillez choisir un rôle.',
             'password.required'     => 'Le mot de passe est obligatoire.',
             'password.min'          => 'Le mot de passe doit contenir au moins 8 caractères.',
             'password.confirmed'    => 'Les mots de passe ne correspondent pas.',
         ]);
 
-        // Créer l'utilisateur
+        // Inscription publique : toujours candidat. Les comptes recruteur/admin
+        // sont créés uniquement par un administrateur.
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => $request->role,
+            'role'     => 'candidate',
         ]);
 
-        // Créer le profil selon le rôle
-        if ($user->role === 'candidate') {
-            CandidateProfile::create(['user_id' => $user->id]);
-        } elseif ($user->role === 'recruiter') {
-            RecruiterProfile::create(['user_id' => $user->id]);
-        }
+        CandidateProfile::create(['user_id' => $user->id]);
 
         // Connecter automatiquement
         Auth::login($user);

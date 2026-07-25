@@ -15,6 +15,12 @@ export const roleGuard: CanActivateFn = (route) => {
     return true;
   }
 
-  router.navigate([currentRole === 'recruiter' ? '/recruiter/dashboard' : '/candidate/dashboard']);
+  const fallback =
+    currentRole === 'admin'
+      ? '/admin/dashboard'
+      : currentRole === 'recruiter'
+        ? '/recruiter/dashboard'
+        : '/candidate/dashboard';
+  router.navigate([fallback]);
   return false;
 };

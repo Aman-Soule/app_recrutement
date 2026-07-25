@@ -1,0 +1,104 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Tableau de bord Administrateur</h1>
+      <p>Vue d'ensemble de l'activité de recrutement.</p>
+    </div>
+    <a routerLink="/admin/recruiters/create" class="btn btn-primary">+ Créer un recruteur</a>
+  </div>
+
+  <div class="card filters">
+    <label for="company-filter">Filtrer par entreprise</label>
+    <select
+      id="company-filter"
+      [(ngModel)]="selectedCompanyId"
+      (ngModelChange)="chargerStats()"
+    >
+      <option [ngValue]="null">Toutes les entreprises</option>
+      @for (entreprise of entreprises(); track entreprise.id) {
+        <option [ngValue]="entreprise.id">{{ entreprise.nom }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else if (stats(); as s) {
+    <div class="grid grid-4">
+      <div class="card stat-card">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 21V8l9-5 9 5v13" />
+            <path d="M9 21v-6h6v6" />
+          </svg>
+        </div>
+        <div>
+          <div class="stat-card__value">{{ s.entreprises }}</div>
+          <div class="stat-card__label">Entreprises</div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="9" cy="8" r="3" />
+            <path d="M2.5 20c0-3.6 3-6.2 6.5-6.2s6.5 2.6 6.5 6.2" stroke-linecap="round" />
+            <circle cx="17" cy="9" r="2.3" />
+            <path d="M15.3 14c2.7.4 4.7 2.5 4.7 6" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div>
+          <div class="stat-card__value">{{ s.recruteurs }}</div>
+          <div class="stat-card__label">Recruteurs</div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+          </svg>
+        </div>
+        <div>
+          <div class="stat-card__value">{{ s.candidats }}</div>
+          <div class="stat-card__label">Candidats</div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="7" width="18" height="13" rx="2" />
+            <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <path d="M3 13h18" />
+          </svg>
+        </div>
+        <div>
+          <div class="stat-card__value">{{ s.offres_actives }}</div>
+          <div class="stat-card__label">Offres actives</div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+            <path d="M14 3v5h5" />
+          </svg>
+        </div>
+        <div>
+          <div class="stat-card__value">{{ s.candidatures }}</div>
+          <div class="stat-card__label">Candidatures</div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div>
+          <div class="stat-card__value">{{ s.embauches }}</div>
+          <div class="stat-card__label">Embauches</div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

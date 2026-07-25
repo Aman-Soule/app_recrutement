@@ -79,36 +79,6 @@
   font-size: 0.9rem;
 }
 
-.role-toggle {
-  display: flex;
-  gap: 10px;
-}
-
-.role-option {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  border: 1px solid var(--gray-300);
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--gray-600);
-  cursor: pointer;
-}
-
-.role-option input {
-  accent-color: var(--primary);
-}
-
-.role-option.active {
-  border-color: var(--primary);
-  background: var(--primary-light);
-  color: var(--primary);
-}
-
 .field-error {
   color: var(--danger);
   font-size: 0.8rem;

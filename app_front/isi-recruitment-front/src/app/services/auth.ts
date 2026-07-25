@@ -17,7 +17,6 @@ export interface RegisterPayload {
   email: string;
   password: string;
   password_confirmation: string;
-  role: Role;
 }
 
 const TOKEN_KEY = 'talentai_token';

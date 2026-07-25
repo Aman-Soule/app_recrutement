@@ -27,6 +27,12 @@ const NAV_CANDIDAT: NavItem[] = [
   { label: 'Profil', path: '/candidate/profile', icon: 'user' },
 ];
 
+const NAV_ADMIN: NavItem[] = [
+  { label: 'Tableau de bord', path: '/admin/dashboard', icon: 'home' },
+  { label: 'Entreprises', path: '/admin/companies', icon: 'briefcase' },
+  { label: 'Recruteurs', path: '/admin/recruiters', icon: 'users' },
+];
+
 @Component({
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive],
@@ -38,9 +44,12 @@ export class Sidebar {
   private router = inject(Router);
   readonly layoutUi = inject(LayoutUiService);
 
-  readonly navItems = computed<NavItem[]>(() =>
-    this.auth.role() === 'recruiter' ? NAV_RECRUTEUR : NAV_CANDIDAT,
-  );
+  readonly navItems = computed<NavItem[]>(() => {
+    const role = this.auth.role();
+    if (role === 'admin') return NAV_ADMIN;
+    if (role === 'recruiter') return NAV_RECRUTEUR;
+    return NAV_CANDIDAT;
+  });
 
   seDeconnecter(): void {
     this.auth.logout().subscribe(() => this.router.navigate(['/login']));

@@ -1,0 +1,66 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Entreprises</h1>
+      <p>Gérez les entreprises inscrites sur la plateforme.</p>
+    </div>
+    <a routerLink="/admin/companies/create" class="btn btn-primary">+ Nouvelle entreprise</a>
+  </div>
+
+  <div class="card filters">
+    <input
+      type="text"
+      placeholder="Rechercher une entreprise..."
+      [(ngModel)]="recherche"
+      (keyup.enter)="charger()"
+    />
+    <button class="btn btn-primary" (click)="charger()">Rechercher</button>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Entreprise</th>
+              <th>Secteur</th>
+              <th>Recruteurs</th>
+              <th>Offres</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entreprise of entreprises(); track entreprise.id) {
+              <tr class="clickable-row" (click)="voirDetail(entreprise.id)">
+                <td><strong>{{ entreprise.nom }}</strong></td>
+                <td>{{ entreprise.secteur || '—' }}</td>
+                <td>{{ entreprise.recruteurs_count ?? 0 }}</td>
+                <td>{{ entreprise.offres_count ?? 0 }}</td>
+                <td>
+                  <button class="btn btn-outline btn-sm" (click)="supprimer(entreprise, $event)">
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-state">Aucune entreprise pour l'instant.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (lastPage() > 1) {
+        <div class="pagination">
+          <button (click)="pagePrecedente()" [disabled]="currentPage() === 1">‹</button>
+          <span>Page {{ currentPage() }} / {{ lastPage() }}</span>
+          <button (click)="pageSuivante()" [disabled]="currentPage() === lastPage()">›</button>
+        </div>
+      }
+    </div>
+  }
+</div>

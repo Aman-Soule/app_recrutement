@@ -1,0 +1,66 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Recruteurs</h1>
+      <p>Gérez les comptes recruteurs de la plateforme.</p>
+    </div>
+    <a routerLink="/admin/recruiters/create" class="btn btn-primary">+ Créer un recruteur</a>
+  </div>
+
+  <div class="card filters">
+    <input
+      type="text"
+      placeholder="Rechercher un recruteur par nom..."
+      [(ngModel)]="recherche"
+      (keyup.enter)="charger()"
+    />
+    <select [(ngModel)]="selectedCompanyId" (ngModelChange)="charger()">
+      <option [ngValue]="null">Toutes les entreprises</option>
+      @for (entreprise of entreprises(); track entreprise.id) {
+        <option [ngValue]="entreprise.id">{{ entreprise.nom }}</option>
+      }
+    </select>
+    <button class="btn btn-primary" (click)="charger()">Rechercher</button>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Entreprise</th>
+              <th>Titre</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (recruteur of recruteurs(); track recruteur.id) {
+              <tr>
+                <td><strong>{{ recruteur.name }}</strong></td>
+                <td>{{ recruteur.email }}</td>
+                <td>{{ recruteur.profil_recruteur?.entreprise?.nom || '—' }}</td>
+                <td>{{ recruteur.profil_recruteur?.titre || '—' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-state">Aucun recruteur pour l'instant.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (lastPage() > 1) {
+        <div class="pagination">
+          <button (click)="pagePrecedente()" [disabled]="currentPage() === 1">‹</button>
+          <span>Page {{ currentPage() }} / {{ lastPage() }}</span>
+          <button (click)="pageSuivante()" [disabled]="currentPage() === lastPage()">›</button>
+        </div>
+      }
+    </div>
+  }
+</div>

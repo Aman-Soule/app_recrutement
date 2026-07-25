@@ -22,22 +22,18 @@ class AuthController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role'     => 'sometimes|in:admin,recruiter,candidate',
         ]);
 
+        // Inscription publique : toujours candidat. Les comptes recruteur/admin
+        // sont créés uniquement par un administrateur (voir Admin\AdminRecruiterController).
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => $request->role ?? 'candidate',
+            'role'     => 'candidate',
         ]);
 
-        // Créer automatiquement le profil selon le rôle
-        if ($user->role === 'candidate') {
-            CandidateProfile::create(['user_id' => $user->id]);
-        } elseif ($user->role === 'recruiter') {
-            RecruiterProfile::create(['user_id' => $user->id]);
-        }
+        CandidateProfile::create(['user_id' => $user->id]);
 
         // Créer le token Sanctum
         $token = $user->createToken('auth_token')->plainTextToken;

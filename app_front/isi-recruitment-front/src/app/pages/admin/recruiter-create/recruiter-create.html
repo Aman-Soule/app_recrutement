@@ -1,0 +1,95 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Créer un compte recruteur</h1>
+      <p>Un mot de passe temporaire sera généré et envoyé par e-mail au recruteur.</p>
+    </div>
+    <a routerLink="/admin/recruiters" class="btn btn-outline">Retour</a>
+  </div>
+
+  @if (result(); as r) {
+    <div class="card success-card">
+      <h2>Compte recruteur créé avec succès</h2>
+      <p>Un e-mail a été envoyé à <strong>{{ r.email }}</strong> avec les identifiants suivants :</p>
+      <div class="temp-password">
+        <code>{{ r.tempPassword }}</code>
+        <button class="btn btn-outline btn-sm" type="button" (click)="copierMotDePasse()">Copier</button>
+      </div>
+      <p class="hint">Conservez ce mot de passe : il ne sera plus jamais affiché après cette page.</p>
+      <a routerLink="/admin/recruiters" class="btn btn-primary">Retour à la liste des recruteurs</a>
+    </div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert alert-error">{{ errorMessage() }}</div>
+    }
+
+    <div class="card">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="field-row">
+          <div class="field">
+            <label for="name">Nom complet</label>
+            <input id="name" type="text" formControlName="name" placeholder="Jean Dupont" />
+          </div>
+          <div class="field">
+            <label for="email">Adresse e-mail</label>
+            <input id="email" type="email" formControlName="email" placeholder="nom@entreprise.com" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Entreprise</label>
+          <div class="entreprise-toggle">
+            <button
+              type="button"
+              class="btn btn-outline btn-sm"
+              [class.active]="!nouvelleEntreprise()"
+              (click)="basculerNouvelleEntreprise(false)"
+            >
+              Entreprise existante
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline btn-sm"
+              [class.active]="nouvelleEntreprise()"
+              (click)="basculerNouvelleEntreprise(true)"
+            >
+              Nouvelle entreprise
+            </button>
+          </div>
+        </div>
+
+        @if (!nouvelleEntreprise()) {
+          <div class="field">
+            <label for="company_id">Sélectionner l'entreprise</label>
+            <select id="company_id" formControlName="company_id">
+              <option value="">— Choisir —</option>
+              @for (entreprise of entreprises(); track entreprise.id) {
+                <option [value]="entreprise.id">{{ entreprise.nom }}</option>
+              }
+            </select>
+          </div>
+        } @else {
+          <div class="field">
+            <label for="company_nom">Nom de la nouvelle entreprise</label>
+            <input id="company_nom" type="text" formControlName="company_nom" placeholder="Acme Corp" />
+          </div>
+        }
+
+        <div class="field-row">
+          <div class="field">
+            <label for="titre">Titre / fonction</label>
+            <input id="titre" type="text" formControlName="titre" placeholder="Responsable RH" />
+          </div>
+          <div class="field">
+            <label for="telephone">Téléphone</label>
+            <input id="telephone" type="text" formControlName="telephone" />
+          </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Création en cours...' : 'Créer le compte recruteur' }}
+        </button>
+      </form>
+    </div>
+  }
+</div>

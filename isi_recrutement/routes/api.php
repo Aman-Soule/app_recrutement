@@ -12,6 +12,10 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\AiMatchScoreController;
+use App\Http\Controllers\Admin\AdminCompanyController;
+use App\Http\Controllers\Admin\AdminRecruiterController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminStatsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +119,35 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Matching IA recruteur
         Route::get('/offres/{jobOffer}/meilleurs-candidats', [AiMatchScoreController::class, 'meilleursCandidats']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Routes Administrateur uniquement
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin')->group(function () {
+
+        // Entreprises (CRUD complet)
+        Route::get('/admin/entreprises',              [AdminCompanyController::class, 'index']);
+        Route::post('/admin/entreprises',              [AdminCompanyController::class, 'store']);
+        Route::get('/admin/entreprises/{company}',    [AdminCompanyController::class, 'show']);
+        Route::put('/admin/entreprises/{company}',    [AdminCompanyController::class, 'update']);
+        Route::delete('/admin/entreprises/{company}', [AdminCompanyController::class, 'destroy']);
+
+        // Recruteurs
+        Route::get('/admin/recruteurs',        [AdminRecruiterController::class, 'index']);
+        Route::post('/admin/recruteurs',       [AdminRecruiterController::class, 'store']);
+        Route::get('/admin/recruteurs/{user}', [AdminRecruiterController::class, 'show']);
+        Route::put('/admin/recruteurs/{user}', [AdminRecruiterController::class, 'update']);
+
+        // Utilisateurs (tous rôles)
+        Route::get('/admin/utilisateurs',        [AdminUserController::class, 'index']);
+        Route::get('/admin/utilisateurs/{user}', [AdminUserController::class, 'show']);
+        Route::put('/admin/utilisateurs/{user}', [AdminUserController::class, 'update']);
+
+        // Statistiques
+        Route::get('/admin/stats', [AdminStatsController::class, 'index']);
     });
 
     /*

@@ -138,6 +138,56 @@ export const routes: Routes = [
           import('./pages/recruiter/profile-edit/profile-edit').then((m) => m.ProfileEdit),
       },
 
+      // Espace admin
+      {
+        path: 'admin/dashboard',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () => import('./pages/admin/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'admin/companies',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () =>
+          import('./pages/admin/companies/companies').then((m) => m.Companies),
+      },
+      {
+        path: 'admin/companies/create',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () =>
+          import('./pages/admin/company-edit/company-edit').then((m) => m.CompanyEdit),
+      },
+      {
+        path: 'admin/companies/:id',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () =>
+          import('./pages/admin/company-detail/company-detail').then((m) => m.CompanyDetail),
+      },
+      {
+        path: 'admin/companies/:id/edit',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () =>
+          import('./pages/admin/company-edit/company-edit').then((m) => m.CompanyEdit),
+      },
+      {
+        path: 'admin/recruiters',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () =>
+          import('./pages/admin/recruiters/recruiters').then((m) => m.Recruiters),
+      },
+      {
+        path: 'admin/recruiters/create',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () =>
+          import('./pages/admin/recruiter-create/recruiter-create').then((m) => m.RecruiterCreate),
+      },
+
       // Compte (accessible aux deux rôles)
       {
         path: 'account',
