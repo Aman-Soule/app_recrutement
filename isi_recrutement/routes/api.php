@@ -11,6 +11,7 @@ use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AiMatchScoreController;
 use App\Http\Controllers\Admin\AdminCompanyController;
 use App\Http\Controllers\Admin\AdminRecruiterController;
@@ -159,4 +160,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages/non-lus',               [MessageController::class, 'nonLus']);
     Route::get('/messages/conversations',         [MessageController::class, 'conversations']);
     Route::get('/messages/conversation/{userId}', [MessageController::class, 'conversation']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications (candidat ET recruteur)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/notifications',            [NotificationController::class, 'index']);
+    Route::get('/notifications/non-lues',   [NotificationController::class, 'nonLues']);
+    Route::put('/notifications/{id}/lu',    [NotificationController::class, 'marquerLu']);
+    Route::put('/notifications/lu-tout',    [NotificationController::class, 'marquerToutLu']);
 });

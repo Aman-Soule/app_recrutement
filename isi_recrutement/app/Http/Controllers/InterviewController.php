@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Interview;
 use App\Models\Application;
+use App\Notifications\InterviewScheduled;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class InterviewController extends Controller
 {
@@ -33,9 +35,17 @@ class InterviewController extends Controller
         // Mettre à jour le statut de la candidature
         $application->update(['statut' => 'entretien']);
 
+        $entretien->load('candidature.candidat.utilisateur', 'candidature.offre');
+
+        try {
+            $entretien->candidature->candidat?->utilisateur?->notify(new InterviewScheduled($entretien));
+        } catch (\Throwable $e) {
+            Log::warning('Échec de la notification d\'entretien planifié : ' . $e->getMessage());
+        }
+
         return response()->json([
             'message'   => 'Entretien planifié avec succès',
-            'entretien' => $entretien->load('candidature.candidat.utilisateur'),
+            'entretien' => $entretien,
         ], 201);
     }
 

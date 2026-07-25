@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\JobOffer;
+use App\Notifications\ApplicationStatusChanged;
+use App\Notifications\ApplicationSubmitted;
 use App\Services\MatchingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ApplicationController extends Controller
 {
@@ -43,6 +46,8 @@ class ApplicationController extends Controller
 
         // Incrémenter le compteur de candidats
         $jobOffer->increment('nombre_candidats');
+
+        $this->notifierRecruteurNouvelleCandidature($candidature, $jobOffer);
 
         return response()->json([
             'message'     => 'Candidature envoyée avec succès',
@@ -103,9 +108,34 @@ class ApplicationController extends Controller
             'notes_recruteur' => $request->notes_recruteur,
         ]);
 
+        $this->notifierCandidatChangementStatut($application);
+
         return response()->json([
             'message'     => 'Statut mis à jour',
             'candidature' => $application,
         ]);
+    }
+
+    /** Notifie le recruteur responsable de l'offre qu'une nouvelle candidature est arrivée */
+    private function notifierRecruteurNouvelleCandidature(Application $candidature, JobOffer $jobOffer): void
+    {
+        try {
+            $jobOffer->loadMissing('recruteur.utilisateur');
+            $candidature->loadMissing('candidat.utilisateur', 'offre');
+            $jobOffer->recruteur?->utilisateur?->notify(new ApplicationSubmitted($candidature));
+        } catch (\Throwable $e) {
+            Log::warning('Échec de la notification de nouvelle candidature : ' . $e->getMessage());
+        }
+    }
+
+    /** Notifie le candidat que le statut de sa candidature a changé */
+    private function notifierCandidatChangementStatut(Application $application): void
+    {
+        try {
+            $application->loadMissing('candidat.utilisateur', 'offre');
+            $application->candidat?->utilisateur?->notify(new ApplicationStatusChanged($application));
+        } catch (\Throwable $e) {
+            Log::warning('Échec de la notification de changement de statut : ' . $e->getMessage());
+        }
     }
 }
