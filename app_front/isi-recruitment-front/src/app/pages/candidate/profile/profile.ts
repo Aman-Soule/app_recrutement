@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { CandidateProfileService } from '../../../services/candidate-profile.service';
 import { AuthService } from '../../../services/auth';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
+import { ImagePreviewService } from '../../../services/image-preview.service';
 import { CandidateProfile, NiveauCompetence, Skill } from '../../../models/user.model';
 import { extractErrorMessage } from '../../../services/api';
 
@@ -16,6 +17,7 @@ export class Profile implements OnInit {
   private candidateProfileService = inject(CandidateProfileService);
   private authService = inject(AuthService);
   private confirmDialog = inject(ConfirmDialogService);
+  readonly imagePreview = inject(ImagePreviewService);
   readonly currentUser = this.authService.currentUser;
 
   readonly loading = signal(true);

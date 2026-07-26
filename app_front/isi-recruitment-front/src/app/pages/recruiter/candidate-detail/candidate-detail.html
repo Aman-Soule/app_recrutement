@@ -27,7 +27,7 @@
             <div class="upload-block">
               <div class="upload-avatar">
                 @if (profil.avatar_url) {
-                  <img [src]="profil.avatar_url" alt="" />
+                  <img [src]="profil.avatar_url" alt="" (click)="imagePreview.open(profil.avatar_url)" />
                 } @else {
                   <span>{{ profil.utilisateur?.name?.[0] ?? '?' }}</span>
                 }
@@ -133,9 +133,14 @@
                 <p class="interview-row__name">{{ candidature.offre?.titre }}</p>
                 <p class="interview-row__meta">{{ candidature.postule_le | date: 'dd/MM/yyyy' }}</p>
               </div>
-              <span class="badge" [ngClass]="badgeClass(candidature.statut)">
-                {{ libelles[candidature.statut] }}
-              </span>
+              <div class="interview-row__actions">
+                <span class="badge" [ngClass]="badgeClass(candidature.statut)">
+                  {{ libelles[candidature.statut] }}
+                </span>
+                <button class="btn btn-outline btn-sm" type="button" (click)="planifierEntretien(candidature)">
+                  Planifier un entretien
+                </button>
+              </div>
             </div>
           }
         } @else {

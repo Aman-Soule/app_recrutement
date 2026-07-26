@@ -1,7 +1,8 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { DatePipe, NgClass } from '@angular/common';
 import { CandidateProfileService } from '../../../services/candidate-profile.service';
+import { ImagePreviewService } from '../../../services/image-preview.service';
 import { CandidateProfile, NiveauCompetence, Skill } from '../../../models/user.model';
 import { Application, LIBELLES_STATUT_CANDIDATURE, StatutCandidature } from '../../../models/application.model';
 
@@ -13,7 +14,9 @@ import { Application, LIBELLES_STATUT_CANDIDATURE, StatutCandidature } from '../
 })
 export class CandidateDetail implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private candidateProfileService = inject(CandidateProfileService);
+  readonly imagePreview = inject(ImagePreviewService);
 
   readonly loading = signal(true);
   readonly errorMessage = signal<string | null>(null);
@@ -50,6 +53,10 @@ export class CandidateDetail implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  planifierEntretien(candidature: Application): void {
+    this.router.navigate(['/recruiter/interviews'], { queryParams: { applicationId: candidature.id } });
   }
 
   badgeClass(statut: StatutCandidature): string {

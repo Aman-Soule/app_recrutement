@@ -19,8 +19,8 @@
       <div class="upload-row">
         <div class="upload-block">
           <div class="upload-avatar">
-            @if (profil()?.avatar_url) {
-              <img [src]="profil()?.avatar_url" alt="" />
+            @if (profil()?.avatar_url; as url) {
+              <img [src]="url" alt="" (click)="imagePreview.open(url)" />
             } @else {
               <span>{{ currentUser()?.name?.[0] ?? '?' }}</span>
             }

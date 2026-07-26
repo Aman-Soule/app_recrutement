@@ -17,12 +17,18 @@
 
       <form [formGroup]="form" (ngSubmit)="enregistrer()">
         <div class="field">
-          <label for="application_id">Candidature</label>
-          <select id="application_id" formControlName="application_id">
-            @for (candidature of candidatures(); track candidature.id) {
-              <option [value]="candidature.id">{{ libelleCandidature(candidature) }}</option>
-            }
-          </select>
+          @if (candidatureSelectionnee(); as candidature) {
+            <label>Candidature</label>
+            <p class="static-value">{{ libelleCandidature(candidature) }}</p>
+            <input type="hidden" formControlName="application_id" />
+          } @else {
+            <label for="application_id">Candidature</label>
+            <select id="application_id" formControlName="application_id">
+              @for (candidature of candidatures(); track candidature.id) {
+                <option [value]="candidature.id">{{ libelleCandidature(candidature) }}</option>
+              }
+            </select>
+          }
         </div>
 
         <div class="field-row">

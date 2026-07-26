@@ -72,8 +72,8 @@
         <span class="header__role">{{ libelleRole() }}</span>
       </div>
       <div class="header__avatar">
-        @if (avatarUrl()) {
-          <img [src]="avatarUrl()" alt="" />
+        @if (avatarUrl(); as url) {
+          <img [src]="url" alt="" (click)="imagePreview.open(url)" />
         } @else {
           {{ initiales() }}
         }

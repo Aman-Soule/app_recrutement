@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth';
 import { MessageService } from '../../services/message.service';
 import { NotificationService } from '../../services/notification.service';
 import { LayoutUiService } from '../../services/layout-ui.service';
+import { ImagePreviewService } from '../../services/image-preview.service';
 import { AppNotification } from '../../models/notification.model';
 
 const INTERVALLE_POLLING_MS = 45000;
@@ -20,6 +21,7 @@ export class Header implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private router = inject(Router);
   readonly layoutUi = inject(LayoutUiService);
+  readonly imagePreview = inject(ImagePreviewService);
 
   readonly user = this.auth.currentUser;
   readonly nonLus = signal(0);

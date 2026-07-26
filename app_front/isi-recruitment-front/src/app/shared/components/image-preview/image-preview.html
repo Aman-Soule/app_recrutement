@@ -1,0 +1,6 @@
+@if (imageUrl(); as url) {
+  <div class="image-preview-backdrop" (click)="fermer()">
+    <button class="image-preview-close" type="button" aria-label="Fermer" (click)="fermer()">&times;</button>
+    <img [src]="url" alt="" (click)="$event.stopPropagation()" />
+  </div>
+}

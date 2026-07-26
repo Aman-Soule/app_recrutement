@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { InterviewService } from '../../../services/interview.service';
 import { ApplicationService } from '../../../services/application.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
@@ -23,6 +24,8 @@ export class Interviews implements OnInit {
   private interviewService = inject(InterviewService);
   private applicationService = inject(ApplicationService);
   private confirmDialog = inject(ConfirmDialogService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   readonly entretiens = signal<Interview[]>([]);
   readonly candidatures = signal<Application[]>([]);
@@ -31,6 +34,7 @@ export class Interviews implements OnInit {
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly feedbackTarget = signal<Interview | null>(null);
+  readonly preselectedApplicationId = signal<number | null>(null);
 
   readonly libellesEtape = LIBELLES_ETAPE_ENTRETIEN;
   readonly libellesStatut = LIBELLES_STATUT_ENTRETIEN;
@@ -58,10 +62,25 @@ export class Interviews implements OnInit {
     this.entretiens().filter((e) => new Date(e.planifie_le).getTime() < Date.now()),
   );
 
+  readonly candidatureSelectionnee = computed(() => {
+    const id = this.preselectedApplicationId();
+    return id ? (this.candidatures().find((c) => c.id === id) ?? null) : null;
+  });
+
   ngOnInit(): void {
     this.charger();
+
+    const applicationIdParam = this.route.snapshot.queryParamMap.get('applicationId');
+    const applicationId = applicationIdParam ? Number(applicationIdParam) : null;
+
     this.applicationService.pourRecruteur().subscribe({
-      next: (res) => this.candidatures.set(res.data),
+      next: (res) => {
+        this.candidatures.set(res.data);
+        if (applicationId) {
+          this.ouvrirCreation(applicationId);
+          this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+        }
+      },
       error: () => {},
     });
   }
@@ -77,9 +96,10 @@ export class Interviews implements OnInit {
     });
   }
 
-  ouvrirCreation(): void {
+  ouvrirCreation(applicationId?: number): void {
+    this.preselectedApplicationId.set(applicationId ?? null);
     this.form.reset({
-      application_id: this.candidatures()[0]?.id ?? 0,
+      application_id: applicationId ?? this.candidatures()[0]?.id ?? 0,
       type: 'video',
       etape: 'rh',
       planifie_le: '',

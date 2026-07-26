@@ -4,6 +4,7 @@ import { RecruiterProfileService } from '../../../services/recruiter-profile.ser
 import { CompanyService } from '../../../services/company.service';
 import { AuthService } from '../../../services/auth';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
+import { ImagePreviewService } from '../../../services/image-preview.service';
 import { RecruiterProfile } from '../../../models/user.model';
 import { extractErrorMessage } from '../../../services/api';
 
@@ -18,6 +19,7 @@ export class Settings implements OnInit {
   private companyService = inject(CompanyService);
   private authService = inject(AuthService);
   private confirmDialog = inject(ConfirmDialogService);
+  readonly imagePreview = inject(ImagePreviewService);
 
   readonly onglet = signal<'entreprise' | 'profil'>('entreprise');
   readonly loading = signal(true);
