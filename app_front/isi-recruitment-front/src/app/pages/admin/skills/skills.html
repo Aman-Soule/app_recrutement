@@ -1,0 +1,75 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Référentiel de compétences</h1>
+      <p>Ajoutez ou supprimez les compétences proposées aux candidats et recruteurs.</p>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="card filters">
+    <input
+      type="text"
+      placeholder="Nom de la compétence..."
+      [(ngModel)]="nouvelleCompetence"
+      (keyup.enter)="ajouter()"
+    />
+    <input
+      type="text"
+      placeholder="Catégorie (optionnel)"
+      [(ngModel)]="nouvelleCategorie"
+      (keyup.enter)="ajouter()"
+    />
+    <button class="btn btn-primary" [disabled]="creating()" (click)="ajouter()">
+      + Ajouter
+    </button>
+  </div>
+
+  <div class="card filters">
+    <input
+      type="text"
+      placeholder="Rechercher une compétence..."
+      [(ngModel)]="recherche"
+      (keyup.enter)="charger()"
+    />
+    <button class="btn btn-outline" (click)="charger()">Rechercher</button>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Compétence</th>
+              <th>Catégorie</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (competence of competences(); track competence.id) {
+              <tr>
+                <td><strong>{{ competence.nom }}</strong></td>
+                <td>{{ competence.categorie || '—' }}</td>
+                <td class="actions">
+                  <button class="btn btn-outline btn-sm" (click)="supprimer(competence)">
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="empty-state">Aucune compétence pour l'instant.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

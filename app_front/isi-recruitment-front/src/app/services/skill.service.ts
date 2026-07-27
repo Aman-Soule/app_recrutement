@@ -20,4 +20,15 @@ export class SkillService {
       categorie,
     });
   }
+
+  update(id: number, nom: string, categorie?: string): Observable<{ message: string; competence: Skill }> {
+    return this.http.put<{ message: string; competence: Skill }>(
+      `${API_BASE_URL}/admin/competences/${id}`,
+      { nom, categorie },
+    );
+  }
+
+  remove(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${API_BASE_URL}/admin/competences/${id}`);
+  }
 }

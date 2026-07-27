@@ -50,4 +50,44 @@ class AdminUserController extends Controller
             'user'    => $user->fresh(),
         ]);
     }
+
+    /** Activer ou désactiver un compte utilisateur */
+    public function changerStatut(Request $request, User $user)
+    {
+        $request->validate([
+            'actif' => 'required|boolean',
+        ]);
+
+        if ($user->id === $request->user()->id) {
+            return response()->json([
+                'message' => 'Vous ne pouvez pas modifier le statut de votre propre compte.',
+            ], 422);
+        }
+
+        $user->actif = $request->boolean('actif');
+        $user->save();
+
+        if (!$user->actif) {
+            $user->tokens()->delete();
+        }
+
+        return response()->json([
+            'message' => $user->actif ? 'Compte activé' : 'Compte désactivé',
+            'user'    => $user->fresh(),
+        ]);
+    }
+
+    /** Supprimer définitivement un compte utilisateur */
+    public function destroy(Request $request, User $user)
+    {
+        if ($user->id === $request->user()->id) {
+            return response()->json([
+                'message' => 'Vous ne pouvez pas supprimer votre propre compte.',
+            ], 422);
+        }
+
+        $user->delete();
+
+        return response()->json(['message' => 'Utilisateur supprimé']);
+    }
 }

@@ -187,6 +187,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/admin/recruiter-create/recruiter-create').then((m) => m.RecruiterCreate),
       },
+      {
+        path: 'admin/users',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () => import('./pages/admin/users/users').then((m) => m.Users),
+      },
+      {
+        path: 'admin/skills',
+        canActivate: [roleGuard],
+        data: { role: 'admin' },
+        loadComponent: () => import('./pages/admin/skills/skills').then((m) => m.Skills),
+      },
 
       // Compte (accessible aux deux rôles)
       {

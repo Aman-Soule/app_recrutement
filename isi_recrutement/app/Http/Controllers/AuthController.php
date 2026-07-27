@@ -62,6 +62,14 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
+        if (!$user->estActif()) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => ['Votre compte a été désactivé. Contactez un administrateur.'],
+            ]);
+        }
+
         // Supprimer les anciens tokens et créer un nouveau
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;

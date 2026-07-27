@@ -1,0 +1,84 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Utilisateurs</h1>
+      <p>Gérez les comptes de la plateforme : activation, désactivation et suppression.</p>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="card filters">
+    <input
+      type="text"
+      placeholder="Rechercher un utilisateur par nom..."
+      [(ngModel)]="recherche"
+      (keyup.enter)="charger()"
+    />
+    <select [(ngModel)]="role" (ngModelChange)="charger()">
+      <option value="">Tous les rôles</option>
+      <option value="admin">Administrateur</option>
+      <option value="recruiter">Recruteur</option>
+      <option value="candidate">Candidat</option>
+    </select>
+    <button class="btn btn-primary" (click)="charger()">Rechercher</button>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else {
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (utilisateur of utilisateurs(); track utilisateur.id) {
+              <tr>
+                <td><strong>{{ utilisateur.name }}</strong></td>
+                <td>{{ utilisateur.email }}</td>
+                <td>{{ utilisateur.role }}</td>
+                <td>
+                  @if (utilisateur.actif) {
+                    <span class="badge badge-success">Actif</span>
+                  } @else {
+                    <span class="badge badge-danger">Désactivé</span>
+                  }
+                </td>
+                <td class="actions">
+                  <button class="btn btn-outline btn-sm" (click)="toggleStatut(utilisateur)">
+                    {{ utilisateur.actif ? 'Désactiver' : 'Activer' }}
+                  </button>
+                  <button class="btn btn-outline btn-sm" (click)="supprimer(utilisateur)">
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-state">Aucun utilisateur pour l'instant.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (lastPage() > 1) {
+        <div class="pagination">
+          <button (click)="pagePrecedente()" [disabled]="currentPage() === 1">‹</button>
+          <span>Page {{ currentPage() }} / {{ lastPage() }}</span>
+          <button (click)="pageSuivante()" [disabled]="currentPage() === lastPage()">›</button>
+        </div>
+      }
+    </div>
+  }
+</div>

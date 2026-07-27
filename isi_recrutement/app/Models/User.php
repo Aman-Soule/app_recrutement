@@ -22,6 +22,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'actif' => 'boolean',
         ];
     }
 
@@ -66,5 +67,10 @@ class User extends Authenticatable
     public function estAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function estActif(): bool
+    {
+        return (bool) $this->actif;
     }
 }

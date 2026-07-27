@@ -143,9 +143,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/admin/recruteurs/{user}', [AdminRecruiterController::class, 'update']);
 
         // Utilisateurs (tous rôles)
-        Route::get('/admin/utilisateurs',        [AdminUserController::class, 'index']);
-        Route::get('/admin/utilisateurs/{user}', [AdminUserController::class, 'show']);
-        Route::put('/admin/utilisateurs/{user}', [AdminUserController::class, 'update']);
+        Route::get('/admin/utilisateurs',           [AdminUserController::class, 'index']);
+        Route::get('/admin/utilisateurs/{user}',    [AdminUserController::class, 'show']);
+        Route::put('/admin/utilisateurs/{user}',    [AdminUserController::class, 'update']);
+        Route::put('/admin/utilisateurs/{user}/statut', [AdminUserController::class, 'changerStatut']);
+        Route::delete('/admin/utilisateurs/{user}', [AdminUserController::class, 'destroy']);
+
+        // Référentiel de compétences (CRUD complet)
+        Route::put('/admin/competences/{skill}',    [SkillController::class, 'update']);
+        Route::delete('/admin/competences/{skill}', [SkillController::class, 'destroy']);
 
         // Statistiques
         Route::get('/admin/stats', [AdminStatsController::class, 'index']);

@@ -35,4 +35,15 @@ export class AdminUserService {
       payload,
     );
   }
+
+  changerStatut(id: number, actif: boolean): Observable<{ message: string; user: User }> {
+    return this.http.put<{ message: string; user: User }>(
+      `${API_BASE_URL}/admin/utilisateurs/${id}/statut`,
+      { actif },
+    );
+  }
+
+  remove(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${API_BASE_URL}/admin/utilisateurs/${id}`);
+  }
 }

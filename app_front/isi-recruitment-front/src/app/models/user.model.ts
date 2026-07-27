@@ -66,6 +66,7 @@ export interface User {
   email: string;
   email_verified_at: string | null;
   role: Role;
+  actif: boolean;
   created_at: string;
   updated_at: string;
   profil_candidat?: CandidateProfile;

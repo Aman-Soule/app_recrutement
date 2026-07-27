@@ -32,6 +32,8 @@ const NAV_ADMIN: NavItem[] = [
   { label: 'Tableau de bord', path: '/admin/dashboard', icon: 'home' },
   { label: 'Entreprises', path: '/admin/companies', icon: 'briefcase' },
   { label: 'Recruteurs', path: '/admin/recruiters', icon: 'users' },
+  { label: 'Utilisateurs', path: '/admin/users', icon: 'user' },
+  { label: 'Compétences', path: '/admin/skills', icon: 'settings' },
 ];
 
 @Component({

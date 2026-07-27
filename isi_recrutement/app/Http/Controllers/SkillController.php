@@ -20,7 +20,7 @@ class SkillController extends Controller
         return response()->json($competences);
     }
 
-    /** Créer une compétence (admin) */
+    /** Créer une compétence */
     public function store(Request $request)
     {
         $request->validate([
@@ -34,5 +34,29 @@ class SkillController extends Controller
             'message'     => 'Compétence créée',
             'competence'  => $competence,
         ], 201);
+    }
+
+    /** Modifier une compétence du référentiel (admin) */
+    public function update(Request $request, Skill $skill)
+    {
+        $request->validate([
+            'nom'       => 'required|string|unique:skills,nom,' . $skill->id,
+            'categorie' => 'nullable|string',
+        ]);
+
+        $skill->update($request->only('nom', 'categorie'));
+
+        return response()->json([
+            'message'    => 'Compétence mise à jour',
+            'competence' => $skill->fresh(),
+        ]);
+    }
+
+    /** Supprimer une compétence du référentiel (admin) */
+    public function destroy(Skill $skill)
+    {
+        $skill->delete();
+
+        return response()->json(['message' => 'Compétence supprimée']);
     }
 }
