@@ -21,6 +21,7 @@ export interface JobOffer {
   competences_requises: number[] | null;
   nombre_candidats: number;
   publie_le: string | null;
+  date_cloture: string | null;
   created_at: string;
   updated_at: string;
   entreprise?: Company;

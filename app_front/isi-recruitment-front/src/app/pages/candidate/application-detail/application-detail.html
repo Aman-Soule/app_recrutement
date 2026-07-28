@@ -1,0 +1,107 @@
+<div class="page">
+  <a routerLink="/candidate/applications" class="back-link">← Retour à mes candidatures</a>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement...</p>
+  } @else if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  } @else if (application(); as application) {
+    <div class="page-header">
+      <div>
+        <h1>{{ application.offre?.titre }}</h1>
+        <p>{{ application.offre?.entreprise?.nom }} · {{ application.offre?.localisation }}</p>
+      </div>
+      <span class="badge" [ngClass]="badgeClass(application.statut)">
+        {{ libelles[application.statut] }}
+      </span>
+    </div>
+
+    <div class="card">
+      <h2>Suivi de la candidature</h2>
+      <app-application-pipeline [statut]="application.statut" />
+    </div>
+
+    <div class="card" style="margin-top: 20px">
+      <h2>Informations</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Date de soumission</span>
+          <span class="info-value">{{ application.postule_le | date: 'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Date de clôture de l'offre</span>
+          <span class="info-value">
+            {{ application.offre?.date_cloture ? (application.offre?.date_cloture | date: 'dd/MM/yyyy') : 'Non renseignée' }}
+          </span>
+        </div>
+        <div class="info-item info-item--full">
+          <span class="info-label">Score IA</span>
+          <app-ai-score-detail
+            [score]="application.score_detaille"
+            [enAttente]="application.score_matching_ia === null"
+          />
+        </div>
+      </div>
+
+      @if (application.lettre_motivation) {
+        <div class="info-item info-item--full" style="margin-top: 18px">
+          <span class="info-label">Lettre de motivation</span>
+          <span class="info-value">{{ application.lettre_motivation }}</span>
+        </div>
+      }
+
+      @if (application.cv_url) {
+        <div style="margin-top: 18px">
+          <a [href]="application.cv_url" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
+            Voir le CV envoyé
+          </a>
+        </div>
+      }
+    </div>
+
+    <div class="card" style="margin-top: 20px">
+      <h2>Rendez-vous</h2>
+      @if (application.entretiens?.length) {
+        @for (entretien of application.entretiens; track entretien.id) {
+          <div class="interview-row">
+            <div>
+              <p class="interview-row__name">
+                {{ libellesEtape[entretien.etape] }} · {{ libellesTypeEntretien[entretien.type] }}
+              </p>
+              <p class="interview-row__meta">
+                {{ entretien.planifie_le | date: 'dd/MM/yyyy HH:mm' }}
+                @if (entretien.lieu_ou_lien) {
+                  · {{ entretien.lieu_ou_lien }}
+                }
+                @if (entretien.recruteur?.utilisateur?.name) {
+                  · Proposé par {{ entretien.recruteur?.utilisateur?.name }}
+                }
+              </p>
+            </div>
+            <div class="interview-row__actions">
+              <span class="badge" [ngClass]="{
+                'badge-warning': entretien.statut === 'en_attente',
+                'badge-success': entretien.statut === 'confirme' || entretien.statut === 'termine',
+                'badge-neutral': entretien.statut === 'annule'
+              }">
+                {{ libellesStatutEntretien[entretien.statut] }}
+              </span>
+              @if (entretien.statut === 'en_attente') {
+                <button
+                  class="btn btn-primary btn-sm"
+                  type="button"
+                  [disabled]="confirmingId() === entretien.id"
+                  (click)="confirmerEntretien(entretien.id)"
+                >
+                  {{ confirmingId() === entretien.id ? 'Confirmation...' : 'Confirmer le rendez-vous' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      } @else {
+        <p class="empty-state">Aucun rendez-vous programmé pour cette candidature.</p>
+      }
+    </div>
+  }
+</div>

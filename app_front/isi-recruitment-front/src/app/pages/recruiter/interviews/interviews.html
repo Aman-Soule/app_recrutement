@@ -128,6 +128,9 @@
           </div>
           <span class="badge badge-info">{{ libellesStatut[entretien.statut] }}</span>
           <button class="btn btn-outline btn-sm" (click)="ouvrirFeedback(entretien)">Feedback</button>
+          <button class="btn btn-outline btn-sm" (click)="changerStatutCandidature(entretien)">
+            Statut candidature
+          </button>
         </div>
       } @empty {
         <p class="empty-state">Aucun entretien à venir.</p>
@@ -157,6 +160,9 @@
           @if (entretien.statut === 'confirme' || entretien.statut === 'en_attente') {
             <button class="btn btn-outline btn-sm" (click)="ouvrirFeedback(entretien)">Feedback</button>
           }
+          <button class="btn btn-outline btn-sm" (click)="changerStatutCandidature(entretien)">
+            Statut candidature
+          </button>
         </div>
       } @empty {
         <p class="empty-state">Aucun entretien passé.</p>
@@ -164,3 +170,12 @@
     </div>
   }
 </div>
+
+@if (selectedCandidature(); as candidature) {
+  <app-application-detail-modal
+    [application]="candidature"
+    role="recruiter"
+    (close)="selectedCandidature.set(null)"
+    (statutChange)="onStatutChange($event)"
+  />
+}

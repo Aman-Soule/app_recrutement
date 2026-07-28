@@ -25,6 +25,11 @@ export class ApplicationService {
     return this.http.get<Application[]>(`${API_BASE_URL}/candidat/candidatures`);
   }
 
+  /** Candidat : détail d'une de ses candidatures */
+  voir(applicationId: number): Observable<Application> {
+    return this.http.get<Application>(`${API_BASE_URL}/candidat/candidatures/${applicationId}`);
+  }
+
   /** Recruteur : candidatures reçues sur une offre précise */
   parOffre(jobOfferId: number, page = 1): Observable<PaginatedResponse<Application>> {
     const params = new HttpParams().set('page', page);
@@ -35,8 +40,9 @@ export class ApplicationService {
   }
 
   /** Recruteur : toutes les candidatures reçues sur ses offres */
-  pourRecruteur(page = 1): Observable<PaginatedResponse<Application>> {
-    const params = new HttpParams().set('page', page);
+  pourRecruteur(page = 1, perPage?: number): Observable<PaginatedResponse<Application>> {
+    let params = new HttpParams().set('page', page);
+    if (perPage) params = params.set('per_page', perPage);
     return this.http.get<PaginatedResponse<Application>>(`${API_BASE_URL}/recruteur/candidatures`, {
       params,
     });

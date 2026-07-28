@@ -1,0 +1,94 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--gray-700);
+}
+
+.job-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.job-text {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.ranking-card h2 {
+  margin-bottom: 4px;
+}
+
+.ranking-card__subtitle {
+  color: var(--gray-500);
+  font-size: 0.8rem;
+  margin-bottom: 16px;
+}
+
+.ranked-candidate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+  cursor: pointer;
+}
+
+.ranked-candidate:last-of-type {
+  border-bottom: none;
+}
+
+.ranked-candidate__rank {
+  flex-shrink: 0;
+  width: 24px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+.ranked-candidate__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ranked-candidate__name {
+  font-weight: 600;
+  color: var(--gray-900);
+  font-size: 0.88rem;
+}
+
+.ranked-candidate__meta {
+  color: var(--gray-500);
+  font-size: 0.78rem;
+}
+
+.ranked-candidate__scores {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}

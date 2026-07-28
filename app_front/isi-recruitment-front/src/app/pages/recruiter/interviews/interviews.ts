@@ -12,10 +12,11 @@ import {
 } from '../../../models/interview.model';
 import { Application } from '../../../models/application.model';
 import { extractErrorMessage } from '../../../services/api';
+import { ApplicationDetailModal } from '../../../shared/components/application-detail-modal/application-detail-modal';
 
 @Component({
   selector: 'app-interviews',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, ApplicationDetailModal],
   templateUrl: './interviews.html',
   styleUrl: './interviews.scss',
 })
@@ -35,6 +36,7 @@ export class Interviews implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly feedbackTarget = signal<Interview | null>(null);
   readonly preselectedApplicationId = signal<number | null>(null);
+  readonly selectedCandidature = signal<Application | null>(null);
 
   readonly libellesEtape = LIBELLES_ETAPE_ENTRETIEN;
   readonly libellesStatut = LIBELLES_STATUT_ENTRETIEN;
@@ -185,9 +187,26 @@ export class Interviews implements OnInit {
         next: () => {
           this.feedbackTarget.set(null);
           this.charger();
+          // Après un entretien terminé, on invite directement le recruteur à statuer sur la candidature.
+          if (valeurs.statut === 'termine' && cible.candidature) {
+            this.selectedCandidature.set(cible.candidature);
+          }
         },
         error: (err) => this.errorMessage.set(extractErrorMessage(err)),
       });
+  }
+
+  changerStatutCandidature(entretien: Interview): void {
+    if (entretien.candidature) {
+      this.selectedCandidature.set(entretien.candidature);
+    }
+  }
+
+  onStatutChange(updated: Application): void {
+    this.entretiens.update((liste) =>
+      liste.map((e) => (e.candidature?.id === updated.id ? { ...e, candidature: updated } : e)),
+    );
+    this.selectedCandidature.set(updated);
   }
 
   libelleCandidature(candidature: Application): string {

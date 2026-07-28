@@ -1,0 +1,10 @@
+@if (variant === 'bar') {
+  <div class="match-score match-score--bar">
+    <div class="mini-progress">
+      <div class="mini-progress__bar" [ngClass]="barClass()" [style.width.%]="score ?? 0"></div>
+    </div>
+    <span class="badge" [ngClass]="badgeClass()">{{ texte() }}</span>
+  </div>
+} @else {
+  <span class="badge" [ngClass]="badgeClass()">{{ texte() }}</span>
+}

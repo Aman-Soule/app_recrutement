@@ -11,6 +11,25 @@ export type StatutCandidature =
   | 'rejete'
   | 'embauche';
 
+export type SourceScoreIa = 'ia' | 'heuristique';
+
+export interface AiMatchScore {
+  id: number;
+  candidate_profile_id: number;
+  job_offer_id: number;
+  score_global: number;
+  score_competences: number | null;
+  score_experience: number | null;
+  score_localisation: number | null;
+  score_salaire: number | null;
+  competences_matchees: string[] | null;
+  competences_manquantes: string[] | null;
+  resume_ia: string | null;
+  source: SourceScoreIa;
+  calcule_le: string;
+  candidat?: CandidateProfile;
+}
+
 export interface Application {
   id: number;
   candidate_profile_id: number;
@@ -26,6 +45,8 @@ export interface Application {
   offre?: JobOffer;
   candidat?: CandidateProfile;
   entretiens?: Interview[];
+  /** Détail du score IA (sous-scores, compétences matchées/manquantes) */
+  score_detaille?: AiMatchScore | null;
 }
 
 export const ETAPES_CANDIDATURE: StatutCandidature[] = [

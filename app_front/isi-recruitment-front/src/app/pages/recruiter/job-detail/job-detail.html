@@ -1,0 +1,92 @@
+<div class="page">
+  <a routerLink="/recruiter/jobs" class="back-link">← Retour aux offres</a>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement de l'offre...</p>
+  } @else if (offre(); as offre) {
+    <div class="page-header">
+      <div>
+        <h1>{{ offre.titre }}</h1>
+        <p>
+          {{ offre.entreprise?.nom }} · {{ offre.localisation || 'Lieu non précisé' }} ·
+          Réf : {{ offre.reference }}
+        </p>
+      </div>
+      <span class="badge" [ngClass]="badgeClass(offre.statut)">{{ offre.statut }}</span>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="job-main">
+        <div class="card">
+          <div class="tag-row">
+            @if (offre.type_contrat) {
+              <span class="badge badge-info">{{ offre.type_contrat }}</span>
+            }
+            @if (offre.type_lieu) {
+              <span class="badge badge-info">{{ offre.type_lieu }}</span>
+            }
+            @if (offre.departement) {
+              <span class="badge badge-neutral">{{ offre.departement }}</span>
+            }
+            @if (offre.salaire_min || offre.salaire_max) {
+              <span class="badge badge-success">
+                {{ offre.salaire_min || '?' }} - {{ offre.salaire_max || '?' }}
+              </span>
+            }
+            <span class="badge badge-neutral">{{ offre.nombre_candidats }} candidat(s)</span>
+          </div>
+
+          @if (offre.description) {
+            <h2 class="section-title">Description du poste</h2>
+            <p class="job-text">{{ offre.description }}</p>
+          }
+
+          @if (offre.exigences) {
+            <h2 class="section-title">Profil recherché</h2>
+            <p class="job-text">{{ offre.exigences }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="card ranking-card">
+        <h2>Candidats classés</h2>
+        <p class="ranking-card__subtitle">Triés par score IA, du plus fort au moins fort.</p>
+
+        @if (classementLoading()) {
+          <p class="loading-state">Chargement...</p>
+        } @else if (classement().length) {
+          @for (entree of classement(); track entree.id; let i = $index) {
+            <div class="ranked-candidate clickable-row" (click)="voirCandidat(entree.candidate_profile_id)">
+              <span class="ranked-candidate__rank">#{{ (currentPage() - 1) * 10 + i + 1 }}</span>
+              <app-avatar
+                size="sm"
+                [url]="entree.candidat?.avatar_url ?? null"
+                [name]="entree.candidat?.utilisateur?.name ?? ''"
+              />
+              <div class="ranked-candidate__info">
+                <p class="ranked-candidate__name">{{ entree.candidat?.utilisateur?.name }}</p>
+                <p class="ranked-candidate__meta">{{ entree.candidat?.titre || 'Titre non renseigné' }}</p>
+              </div>
+              <div class="ranked-candidate__scores">
+                <app-match-score [score]="entree.score_global" label="IA" />
+                <app-match-score [score]="entree.candidat?.score_employabilite ?? null" label="Employabilité" />
+              </div>
+            </div>
+          }
+
+          @if (lastPage() > 1) {
+            <div class="pagination">
+              <button (click)="pagePrecedente()" [disabled]="currentPage() === 1">‹</button>
+              <span>Page {{ currentPage() }} / {{ lastPage() }}</span>
+              <button (click)="pageSuivante()" [disabled]="currentPage() === lastPage()">›</button>
+            </div>
+          }
+        } @else {
+          <p class="empty-state">Aucun candidat pour cette offre pour l'instant.</p>
+        }
+      </div>
+    </div>
+  } @else {
+    <p class="empty-state">Cette offre est introuvable.</p>
+  }
+</div>

@@ -55,6 +55,15 @@ export const routes: Routes = [
           import('./pages/candidate/applications/applications').then((m) => m.Applications),
       },
       {
+        path: 'candidate/applications/:id',
+        canActivate: [roleGuard],
+        data: { role: 'candidate' },
+        loadComponent: () =>
+          import('./pages/candidate/application-detail/application-detail').then(
+            (m) => m.ApplicationDetail,
+          ),
+      },
+      {
         path: 'candidate/profile',
         canActivate: [roleGuard],
         data: { role: 'candidate' },
@@ -88,6 +97,13 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { role: 'recruiter' },
         loadComponent: () => import('./pages/recruiter/jobs/jobs').then((m) => m.Jobs),
+      },
+      {
+        path: 'recruiter/jobs/:id',
+        canActivate: [roleGuard],
+        data: { role: 'recruiter' },
+        loadComponent: () =>
+          import('./pages/recruiter/job-detail/job-detail').then((m) => m.JobDetail),
       },
       {
         path: 'recruiter/candidates',

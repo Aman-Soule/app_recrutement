@@ -45,6 +45,7 @@
               <th>Candidat</th>
               <th>Titre</th>
               <th>Expérience</th>
+              <th>Score IA</th>
               <th>Force du profil</th>
               <th>Disponibilité</th>
             </tr>
@@ -53,17 +54,21 @@
             @for (candidat of candidats(); track candidat.id) {
               <tr class="clickable-row" (click)="voirDetail(candidat.id)">
                 <td>
-                  <strong>{{ candidat.utilisateur?.name }}</strong>
-                  <div class="candidate-email">{{ candidat.utilisateur?.email }}</div>
+                  <div class="candidate-identity">
+                    <app-avatar
+                      [url]="candidat.avatar_url"
+                      [name]="candidat.utilisateur?.name ?? ''"
+                    />
+                    <div>
+                      <strong>{{ candidat.utilisateur?.name }}</strong>
+                      <div class="candidate-email">{{ candidat.utilisateur?.email }}</div>
+                    </div>
+                  </div>
                 </td>
                 <td>{{ candidat.titre || '—' }}</td>
                 <td>{{ candidat.annees_experience }} an(s)</td>
-                <td>
-                  <div class="mini-progress">
-                    <div class="mini-progress__bar" [style.width.%]="candidat.force_profil"></div>
-                  </div>
-                  {{ candidat.force_profil }}%
-                </td>
+                <td><app-match-score [score]="candidat.score_employabilite" /></td>
+                <td><app-match-score [score]="candidat.force_profil" variant="bar" /></td>
                 <td>
                   <span class="badge" [ngClass]="badgeClass(candidat.disponibilite)">
                     {{ candidat.disponibilite }}
@@ -72,7 +77,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">Aucun candidat pour l'instant.</td>
+                <td colspan="6" class="empty-state">Aucun candidat pour l'instant.</td>
               </tr>
             }
           </tbody>
@@ -87,24 +92,34 @@
         </div>
       }
     </div>
+  } @else if (candidaturesLoading()) {
+    <p class="loading-state">Chargement...</p>
   } @else {
     <div class="kanban">
-      @for (colonne of candidatsParColonne(); track colonne.disponibilite) {
+      @for (colonne of candidaturesParColonne(); track colonne.statut) {
         <div class="kanban__column">
           <div class="kanban__column-header">
             <span>{{ colonne.label }}</span>
-            <span class="kanban__count">{{ colonne.candidats.length }}</span>
+            <span class="kanban__count">{{ colonne.candidatures.length }}</span>
           </div>
-          @for (candidat of colonne.candidats; track candidat.id) {
-            <div class="kanban-card clickable-row" (click)="voirDetail(candidat.id)">
-              <p class="kanban-card__title">{{ candidat.utilisateur?.name }}</p>
-              <p class="kanban-card__meta">{{ candidat.titre || 'Titre non renseigné' }}</p>
-              <p class="kanban-card__meta">{{ candidat.annees_experience }} an(s) d'expérience</p>
+          @for (candidature of colonne.candidatures; track candidature.id) {
+            <div class="kanban-card clickable-row" (click)="ouvrirCandidature(candidature)">
+              <div class="kanban-card__header">
+                <app-avatar
+                  size="sm"
+                  [url]="candidature.candidat?.avatar_url ?? null"
+                  [name]="candidature.candidat?.utilisateur?.name ?? ''"
+                />
+                <p class="kanban-card__title">{{ candidature.candidat?.utilisateur?.name }}</p>
+              </div>
+              <p class="kanban-card__meta">{{ candidature.offre?.titre }}</p>
+              <p class="kanban-card__meta">{{ candidature.postule_le | date: 'dd/MM/yyyy' }}</p>
               <div class="kanban-card__footer">
-                <div class="mini-progress">
-                  <div class="mini-progress__bar" [style.width.%]="candidat.force_profil"></div>
-                </div>
-                {{ candidat.force_profil }}%
+                @if (candidature.score_matching_ia === null) {
+                  <span class="badge badge-neutral">Analyse en cours…</span>
+                } @else {
+                  <app-match-score [score]="candidature.score_matching_ia" label="IA" />
+                }
               </div>
             </div>
           } @empty {
@@ -115,3 +130,12 @@
     </div>
   }
 </div>
+
+@if (selectedCandidature(); as candidature) {
+  <app-application-detail-modal
+    [application]="candidature"
+    role="recruiter"
+    (close)="selectedCandidature.set(null)"
+    (statutChange)="onStatutChange($event)"
+  />
+}

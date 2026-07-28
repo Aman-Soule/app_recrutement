@@ -26,6 +26,8 @@ class CandidateProfileController extends Controller
                 });
             })
             ->distinct()
+            ->orderByDesc('score_employabilite')
+            ->orderByDesc('force_profil')
             ->paginate(10);
 
         return response()->json($profils);

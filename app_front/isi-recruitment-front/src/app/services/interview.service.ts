@@ -50,4 +50,12 @@ export class InterviewService {
       payload,
     );
   }
+
+  /** Candidat : confirmer sa présence à un entretien proposé */
+  confirmer(interviewId: number): Observable<{ message: string; entretien: Interview }> {
+    return this.http.put<{ message: string; entretien: Interview }>(
+      `${API_BASE_URL}/candidat/entretiens/${interviewId}/confirmer`,
+      {},
+    );
+  }
 }

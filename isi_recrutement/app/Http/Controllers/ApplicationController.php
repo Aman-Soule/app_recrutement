@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ScannerCandidatureJob;
+use App\Models\AiMatchScore;
 use App\Models\Application;
 use App\Models\JobOffer;
 use App\Notifications\ApplicationStatusChanged;
 use App\Notifications\ApplicationSubmitted;
-use App\Services\MatchingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ApplicationController extends Controller
 {
-    public function __construct(private MatchingService $matchingService) {}
-
     /** Candidat : postuler à une offre */
     public function store(Request $request, JobOffer $jobOffer)
     {
@@ -33,21 +32,21 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'Vous avez déjà postulé à cette offre'], 409);
         }
 
-        $profil->loadMissing('competences');
-
         $candidature = Application::create([
             'candidate_profile_id' => $profil->id,
             'job_offer_id'         => $jobOffer->id,
             'lettre_motivation'    => $request->lettre_motivation,
             'cv_url'               => $request->cv_url ?? $profil->cv_url,
             'statut'               => 'nouveau',
-            'score_matching_ia'    => $this->matchingService->calculerScore($profil, $jobOffer),
+            // score_matching_ia reste null : calculé de façon asynchrone par ScannerCandidatureJob
         ]);
 
         // Incrémenter le compteur de candidats
         $jobOffer->increment('nombre_candidats');
 
         $this->notifierRecruteurNouvelleCandidature($candidature, $jobOffer);
+
+        ScannerCandidatureJob::dispatch($candidature->id);
 
         return response()->json([
             'message'     => 'Candidature envoyée avec succès',
@@ -66,7 +65,22 @@ class ApplicationController extends Controller
             ->latest()
             ->get();
 
+        $this->attacherScoresDetaillees($candidatures);
+
         return response()->json($candidatures);
+    }
+
+    /** Candidat : voir le détail d'une de ses candidatures */
+    public function voir(Request $request, Application $application)
+    {
+        if ($application->candidate_profile_id !== $request->user()->profilCandidat->id) {
+            abort(403, "Vous n'avez pas accès à cette candidature.");
+        }
+
+        $application->load('offre.entreprise', 'entretiens.recruteur.utilisateur');
+        $this->attacherScoreDetaille($application);
+
+        return response()->json($application);
     }
 
     /** Recruteur : voir les candidatures pour une offre */
@@ -76,6 +90,8 @@ class ApplicationController extends Controller
             ->with('candidat.utilisateur', 'candidat.competences')
             ->orderByDesc('score_matching_ia')
             ->paginate(10);
+
+        $this->attacherScoresDetaillees($candidatures);
 
         return response()->json($candidatures);
     }
@@ -90,9 +106,53 @@ class ApplicationController extends Controller
             })
             ->with('candidat.utilisateur', 'offre')
             ->latest()
-            ->paginate(10);
+            ->paginate($request->integer('per_page', 10));
+
+        $this->attacherScoresDetaillees($candidatures);
 
         return response()->json($candidatures);
+    }
+
+    /** Attache le score IA détaillé (sous-scores, compétences matchées/manquantes) à une candidature */
+    private function attacherScoreDetaille(Application $application): void
+    {
+        $score = AiMatchScore::where('candidate_profile_id', $application->candidate_profile_id)
+            ->where('job_offer_id', $application->job_offer_id)
+            ->first();
+
+        $application->setRelation('scoreDetaille', $score);
+    }
+
+    /** Attache le score IA détaillé à une liste (ou page) de candidatures, en une seule requête */
+    private function attacherScoresDetaillees(mixed $candidatures): void
+    {
+        $collection = $candidatures instanceof \Illuminate\Contracts\Pagination\Paginator
+            ? $candidatures->getCollection()
+            : $candidatures;
+
+        if ($collection->isEmpty()) {
+            return;
+        }
+
+        $paires = $collection
+            ->map(fn (Application $c) => [$c->candidate_profile_id, $c->job_offer_id])
+            ->unique(fn (array $p) => implode('_', $p));
+
+        $scores = AiMatchScore::query()
+            ->where(function ($q) use ($paires) {
+                foreach ($paires as [$candidateId, $offerId]) {
+                    $q->orWhere(function ($qq) use ($candidateId, $offerId) {
+                        $qq->where('candidate_profile_id', $candidateId)->where('job_offer_id', $offerId);
+                    });
+                }
+            })
+            ->get()
+            ->keyBy(fn (AiMatchScore $s) => $s->candidate_profile_id . '_' . $s->job_offer_id);
+
+        $collection->each(fn (Application $c) => $c->setRelation(
+            'scoreDetaille',
+            $scores->get($c->candidate_profile_id . '_' . $c->job_offer_id),
+        ));
     }
 
     /** Recruteur : changer le statut d'une candidature */

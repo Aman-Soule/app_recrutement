@@ -1,0 +1,36 @@
+.match-score--bar {
+  display: inline-flex;
+  align-items: center;
+}
+
+.mini-progress {
+  display: inline-block;
+  width: 60px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  overflow: hidden;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.mini-progress__bar {
+  height: 100%;
+  background: var(--primary);
+}
+
+.mini-progress__bar--success {
+  background: var(--success);
+}
+
+.mini-progress__bar--warning {
+  background: var(--warning);
+}
+
+.mini-progress__bar--danger {
+  background: var(--danger);
+}
+
+.mini-progress__bar--neutral {
+  background: var(--gray-400);
+}

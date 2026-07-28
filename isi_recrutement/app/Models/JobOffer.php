@@ -23,11 +23,13 @@ class JobOffer extends Model
         'competences_requises',
         'nombre_candidats',
         'publie_le',
+        'date_cloture',
     ];
 
     protected $casts = [
         'competences_requises' => 'array', // JSON auto-casté en tableau
         'publie_le' => 'datetime',
+        'date_cloture' => 'date',
     ];
 
     // ---- Relations ----

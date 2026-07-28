@@ -36,10 +36,6 @@
     <div class="modal-panel__body">
       <div class="detail-grid">
         <div class="detail-item">
-          <span class="detail-item__label">Score IA</span>
-          <span class="detail-item__value">{{ application.score_matching_ia ?? '—' }}%</span>
-        </div>
-        <div class="detail-item">
           <span class="detail-item__label">Statut</span>
           <span class="badge" [ngClass]="badgeClass(application.statut)">
             {{ libelles[application.statut] }}
@@ -53,6 +49,14 @@
           <span class="detail-item__label">Date de candidature</span>
           <span class="detail-item__value">{{ application.postule_le | date: 'dd/MM/yyyy' }}</span>
         </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Score IA</h3>
+        <app-ai-score-detail
+          [score]="application.score_detaille"
+          [enAttente]="application.score_matching_ia === null"
+        />
       </div>
 
       @if (application.lettre_motivation) {

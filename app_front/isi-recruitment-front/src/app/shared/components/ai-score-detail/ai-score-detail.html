@@ -1,0 +1,56 @@
+@if (enAttente) {
+  <div class="ai-score">
+    <span class="badge badge-neutral ai-score__pending">
+      <span class="ai-score__spinner"></span>
+      Analyse IA en cours…
+    </span>
+  </div>
+} @else if (!score) {
+  <span class="badge badge-neutral">—</span>
+} @else {
+  <div class="ai-score">
+    <div class="ai-score__global">
+      <app-match-score [score]="score.score_global" label="Score IA" />
+    </div>
+
+    @if (sousScores().length) {
+      <div class="ai-score__sous-scores">
+        @for (sousScore of sousScores(); track sousScore.label) {
+          <div class="ai-score__sous-score">
+            <span class="ai-score__sous-score-label">{{ sousScore.label }}</span>
+            <app-match-score [score]="sousScore.valeur" variant="bar" />
+          </div>
+        }
+      </div>
+    }
+
+    @if (score.competences_matchees?.length || score.competences_manquantes?.length) {
+      <div class="ai-score__competences">
+        @if (score.competences_matchees?.length) {
+          <div class="ai-score__chips">
+            @for (competence of score.competences_matchees; track competence) {
+              <span class="ai-chip ai-chip--match">{{ competence }}</span>
+            }
+          </div>
+        }
+        @if (score.competences_manquantes?.length) {
+          <div class="ai-score__chips">
+            @for (competence of score.competences_manquantes; track competence) {
+              <span class="ai-chip ai-chip--manquante">{{ competence }}</span>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (score.resume_ia) {
+      <p class="ai-score__resume">{{ score.resume_ia }}</p>
+    }
+
+    @if (score.source === 'heuristique') {
+      <p class="ai-score__note">
+        CV non disponible pour l'analyse IA : score basé sur les données du profil.
+      </p>
+    }
+  </div>
+}

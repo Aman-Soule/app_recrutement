@@ -21,18 +21,26 @@
   color: var(--gray-500);
 }
 
-.mini-progress {
-  display: inline-block;
-  width: 60px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--gray-100);
-  overflow: hidden;
-  margin-right: 8px;
-  vertical-align: middle;
+.candidate-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.mini-progress__bar {
-  height: 100%;
-  background: var(--primary);
+.kanban-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.kanban-card__header .kanban-card__title {
+  margin: 0;
+}
+
+.kanban-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }

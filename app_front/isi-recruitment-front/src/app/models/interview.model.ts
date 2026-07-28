@@ -1,4 +1,5 @@
 import { Application } from './application.model';
+import { RecruiterProfile } from './user.model';
 
 export type TypeEntretien = 'video' | 'physique' | 'telephonique';
 export type EtapeEntretien = 'rh' | 'technique' | 'culturel' | 'final';
@@ -21,7 +22,14 @@ export interface Interview {
   created_at: string;
   updated_at: string;
   candidature?: Application;
+  recruteur?: RecruiterProfile;
 }
+
+export const LIBELLES_TYPE_ENTRETIEN: Record<TypeEntretien, string> = {
+  video: 'Visioconférence',
+  physique: 'Présentiel',
+  telephonique: 'Téléphonique',
+};
 
 export const LIBELLES_STATUT_ENTRETIEN: Record<StatutEntretien, string> = {
   en_attente: 'En attente',

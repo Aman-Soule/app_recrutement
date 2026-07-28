@@ -6,6 +6,20 @@
     </div>
   </div>
 
+  <div class="card filters">
+    <input
+      type="text"
+      placeholder="Rechercher par offre ou entreprise..."
+      [(ngModel)]="recherche"
+    />
+    <select [(ngModel)]="filtreStatut">
+      <option value="">Tous les statuts</option>
+      @for (statut of statuts; track statut) {
+        <option [value]="statut">{{ libelles[statut] }}</option>
+      }
+    </select>
+  </div>
+
   <div class="card">
     @if (loading()) {
       <p class="loading-state">Chargement...</p>
@@ -23,11 +37,17 @@
             </tr>
           </thead>
           <tbody>
-            @for (candidature of candidatures(); track candidature.id) {
-              <tr class="row-clickable" (click)="selected.set(candidature)">
+            @for (candidature of candidaturesFiltrees(); track candidature.id) {
+              <tr class="row-clickable" (click)="voirDetail(candidature.id)">
                 <td>{{ candidature.offre?.titre }}</td>
                 <td>{{ candidature.offre?.entreprise?.nom }}</td>
-                <td>{{ candidature.score_matching_ia ?? '—' }}</td>
+                <td>
+                  @if (candidature.score_matching_ia === null) {
+                    <span class="badge badge-neutral">Analyse en cours…</span>
+                  } @else {
+                    <app-match-score [score]="candidature.score_matching_ia" />
+                  }
+                </td>
                 <td>
                   <span class="badge" [ngClass]="badgeClass(candidature.statut)">
                     {{ libelles[candidature.statut] }}
@@ -44,7 +64,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="6" class="empty-state">Vous n'avez pas encore postulé.</td>
+                <td colspan="6" class="empty-state">Aucune candidature ne correspond à ces critères.</td>
               </tr>
             }
           </tbody>
@@ -53,11 +73,3 @@
     }
   </div>
 </div>
-
-@if (selected(); as candidature) {
-  <app-application-detail-modal
-    [application]="candidature"
-    role="candidate"
-    (close)="selected.set(null)"
-  />
-}

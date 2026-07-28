@@ -64,6 +64,27 @@ class InterviewController extends Controller
         return response()->json($entretiens);
     }
 
+    /** Candidat : confirmer sa présence à un entretien proposé par le recruteur */
+    public function confirmer(Request $request, Interview $interview)
+    {
+        $interview->loadMissing('candidature');
+
+        if ($interview->candidature->candidate_profile_id !== $request->user()->profilCandidat->id) {
+            abort(403, "Vous n'avez pas accès à cet entretien.");
+        }
+
+        if ($interview->statut !== 'en_attente') {
+            return response()->json(['message' => 'Cet entretien ne peut plus être confirmé.'], 422);
+        }
+
+        $interview->update(['statut' => 'confirme']);
+
+        return response()->json([
+            'message'   => 'Entretien confirmé',
+            'entretien' => $interview,
+        ]);
+    }
+
     /** Ajouter un feedback après l'entretien */
     public function feedback(Request $request, Interview $interview)
     {

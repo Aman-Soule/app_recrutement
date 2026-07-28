@@ -25,13 +25,7 @@
         <div class="card">
           <div class="upload-row">
             <div class="upload-block">
-              <div class="upload-avatar">
-                @if (profil.avatar_url) {
-                  <img [src]="profil.avatar_url" alt="" (click)="imagePreview.open(profil.avatar_url)" />
-                } @else {
-                  <span>{{ profil.utilisateur?.name?.[0] ?? '?' }}</span>
-                }
-              </div>
+              <app-avatar size="lg" [url]="profil.avatar_url" [name]="profil.utilisateur?.name ?? ''" />
               <div>
                 <span class="badge" [ngClass]="{
                   'badge-success': profil.disponibilite === 'disponible',
@@ -74,11 +68,11 @@
             </div>
             <div class="info-item">
               <span class="info-label">Force du profil</span>
-              <span class="info-value">{{ profil.force_profil }}%</span>
+              <span class="info-value"><app-match-score [score]="profil.force_profil" variant="bar" /></span>
             </div>
             <div class="info-item">
               <span class="info-label">Score d'employabilité</span>
-              <span class="info-value">{{ profil.score_employabilite }}%</span>
+              <span class="info-value"><app-match-score [score]="profil.score_employabilite" /></span>
             </div>
             <div class="info-item info-item--full">
               <span class="info-label">Biographie</span>
@@ -140,6 +134,9 @@
                 <button class="btn btn-outline btn-sm" type="button" (click)="planifierEntretien(candidature)">
                   Planifier un entretien
                 </button>
+                <button class="btn btn-outline btn-sm" type="button" (click)="changerStatut(candidature)">
+                  Changer le statut
+                </button>
               </div>
             </div>
           }
@@ -150,3 +147,12 @@
     </div>
   }
 </div>
+
+@if (selectedCandidature(); as candidature) {
+  <app-application-detail-modal
+    [application]="candidature"
+    role="recruiter"
+    (close)="selectedCandidature.set(null)"
+    (statutChange)="onStatutChange($event)"
+  />
+}

@@ -62,6 +62,13 @@
           </div>
         </div>
 
+        <div class="field-row">
+          <div class="field">
+            <label for="date_cloture">Date de clôture</label>
+            <input id="date_cloture" type="date" formControlName="date_cloture" />
+          </div>
+        </div>
+
         <div class="field">
           <label for="description">Description</label>
           <textarea id="description" rows="3" formControlName="description"></textarea>
@@ -126,7 +133,7 @@
           </thead>
           <tbody>
             @for (offre of offres(); track offre.id) {
-              <tr>
+              <tr class="clickable-row" (click)="voirDetail(offre.id)">
                 <td>
                   <strong>{{ offre.titre }}</strong>
                   <div class="job-ref">Réf : {{ offre.reference }}</div>
@@ -136,7 +143,7 @@
                 <td>{{ offre.nombre_candidats }}</td>
                 <td><span class="badge" [ngClass]="badgeClass(offre.statut)">{{ offre.statut }}</span></td>
                 <td>{{ offre.publie_le ? (offre.publie_le | date: 'dd/MM/yyyy') : '—' }}</td>
-                <td class="actions-cell">
+                <td class="actions-cell" (click)="$event.stopPropagation()">
                   <button class="btn btn-outline btn-sm" (click)="ouvrirEdition(offre)">Modifier</button>
                   <button class="btn btn-danger btn-sm" (click)="supprimer(offre)">Supprimer</button>
                 </td>
@@ -159,14 +166,14 @@
             <span class="kanban__count">{{ colonne.offres.length }}</span>
           </div>
           @for (offre of colonne.offres; track offre.id) {
-            <div class="kanban-card">
+            <div class="kanban-card clickable-row" (click)="voirDetail(offre.id)">
               <p class="kanban-card__title">{{ offre.titre }}</p>
               <p class="kanban-card__meta">{{ offre.departement || 'Sans département' }}</p>
               <p class="kanban-card__meta">{{ offre.localisation || '—' }}</p>
               <div class="kanban-card__footer">
                 <span class="badge badge-neutral">{{ offre.nombre_candidats }} candidat(s)</span>
               </div>
-              <div class="kanban-card__actions">
+              <div class="kanban-card__actions" (click)="$event.stopPropagation()">
                 <button class="btn btn-outline btn-sm" (click)="ouvrirEdition(offre)">Modifier</button>
                 <button class="btn btn-danger btn-sm" (click)="supprimer(offre)">Supprimer</button>
               </div>

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApplicationService } from '../../../services/application.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
+import { MessageService } from '../../../services/message.service';
 import {
   Application,
   LIBELLES_STATUT_CANDIDATURE,
@@ -13,18 +14,20 @@ import {
   LIBELLES_ETAPE_ENTRETIEN,
   LIBELLES_STATUT_ENTRETIEN,
 } from '../../../models/interview.model';
+import { AiScoreDetail } from '../ai-score-detail/ai-score-detail';
 
 export type DetailModalRole = 'candidate' | 'recruiter';
 
 @Component({
   selector: 'app-application-detail-modal',
-  imports: [DatePipe, NgClass, FormsModule, RouterLink],
+  imports: [DatePipe, NgClass, FormsModule, RouterLink, AiScoreDetail],
   templateUrl: './application-detail-modal.html',
   styleUrl: './application-detail-modal.scss',
 })
 export class ApplicationDetailModal implements OnInit {
   private applicationService = inject(ApplicationService);
   private confirmDialog = inject(ConfirmDialogService);
+  private messageService = inject(MessageService);
 
   @Input({ required: true }) application!: Application;
   @Input() role: DetailModalRole = 'candidate';
@@ -81,6 +84,9 @@ export class ApplicationDetailModal implements OnInit {
       .subscribe({
         next: ({ candidature }) => {
           this.saving.set(false);
+          if (this.statutForm === 'embauche') {
+            this.envoyerMessageEmbauche();
+          }
           this.statutChange.emit({ ...this.application, ...candidature });
         },
         error: () => {
@@ -88,5 +94,20 @@ export class ApplicationDetailModal implements OnInit {
           this.error.set("Impossible d'enregistrer le statut.");
         },
       });
+  }
+
+  /** Envoie automatiquement un message de félicitations au candidat lorsqu'il est recruté */
+  private envoyerMessageEmbauche(): void {
+    const destinataireId = this.application.candidat?.user_id;
+    if (!destinataireId) return;
+
+    const poste = this.application.offre?.titre ?? 'ce poste';
+    const entreprise = this.application.offre?.entreprise?.nom;
+    const contenu =
+      `Félicitations ! Votre candidature pour le poste de "${poste}"` +
+      (entreprise ? ` chez ${entreprise}` : '') +
+      ` a été retenue : vous êtes recruté(e) ! Votre contrat de travail vous sera envoyé par e-mail dans les prochains jours. Bienvenue dans l'équipe !`;
+
+    this.messageService.send(destinataireId, contenu, this.application.id).subscribe({ error: () => {} });
   }
 }

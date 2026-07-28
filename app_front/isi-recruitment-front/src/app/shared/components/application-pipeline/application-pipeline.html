@@ -1,0 +1,17 @@
+<div class="pipeline" [class.pipeline--rejete]="estRejete()">
+  @for (etape of etapes; track etape; let i = $index; let last = $last) {
+    <div class="pipeline__step" [class]="'pipeline__step--' + etatEtape(i)">
+      <div class="pipeline__dot"></div>
+      <span class="pipeline__label">{{ libelles[etape] }}</span>
+    </div>
+    @if (!last) {
+      <div class="pipeline__connector" [class.pipeline__connector--complete]="etatEtape(i) === 'complete'"></div>
+    }
+  }
+
+  @if (estEmbauche()) {
+    <span class="badge badge-success pipeline__terminal">Embauché</span>
+  } @else if (estRejete()) {
+    <span class="badge badge-danger pipeline__terminal">Rejeté</span>
+  }
+</div>

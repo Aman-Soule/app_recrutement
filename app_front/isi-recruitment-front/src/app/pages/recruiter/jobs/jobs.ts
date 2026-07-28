@@ -1,6 +1,7 @@
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { JobService } from '../../../services/job.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { JobOffer, StatutOffre } from '../../../models/job.model';
@@ -25,6 +26,7 @@ export class Jobs implements OnInit {
   private fb = inject(FormBuilder);
   private jobService = inject(JobService);
   private confirmDialog = inject(ConfirmDialogService);
+  private router = inject(Router);
 
   readonly offres = signal<JobOffer[]>([]);
   readonly loading = signal(true);
@@ -53,6 +55,7 @@ export class Jobs implements OnInit {
     type_lieu: ['presentiel'],
     type_contrat: ['temps_plein'],
     statut: ['brouillon'],
+    date_cloture: [''],
   });
 
   ngOnInit(): void {
@@ -82,6 +85,10 @@ export class Jobs implements OnInit {
     this.charger();
   }
 
+  voirDetail(offreId: number): void {
+    this.router.navigate(['/recruiter/jobs', offreId]);
+  }
+
   ouvrirCreation(): void {
     this.editingId.set(null);
     this.form.reset({
@@ -92,6 +99,7 @@ export class Jobs implements OnInit {
       type_lieu: 'presentiel',
       type_contrat: 'temps_plein',
       statut: 'brouillon',
+      date_cloture: '',
     });
     this.showForm.set(true);
   }
@@ -106,6 +114,7 @@ export class Jobs implements OnInit {
       type_lieu: offre.type_lieu,
       type_contrat: offre.type_contrat,
       statut: offre.statut,
+      date_cloture: offre.date_cloture ?? '',
     });
     this.showForm.set(true);
   }

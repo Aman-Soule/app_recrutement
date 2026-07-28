@@ -16,6 +16,8 @@ class AiMatchScore extends Model
         'score_salaire',
         'competences_matchees',
         'competences_manquantes',
+        'resume_ia',
+        'source',
         'calcule_le',
     ];
 

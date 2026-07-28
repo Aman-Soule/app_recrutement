@@ -51,6 +51,7 @@ class JobOfferController extends Controller
             'salaire_max'         => 'nullable|string',
             'statut'              => 'nullable|in:brouillon,actif,ferme',
             'competences_requises' => 'nullable|array',
+            'date_cloture'        => 'nullable|date',
         ]);
 
         $recruteur = $request->user()->profilRecruteur;
@@ -82,6 +83,7 @@ class JobOfferController extends Controller
             'titre'                => 'nullable|string|max:255',
             'statut'               => 'nullable|in:brouillon,actif,ferme',
             'competences_requises' => 'nullable|array',
+            'date_cloture'         => 'nullable|date',
         ]);
 
         // Mettre à jour la date de publication si l'offre devient active
