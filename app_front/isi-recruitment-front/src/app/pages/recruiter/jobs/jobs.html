@@ -74,6 +74,71 @@
           <textarea id="description" rows="3" formControlName="description"></textarea>
         </div>
 
+        <div class="field">
+          <label>Compétences requises</label>
+          <p class="field-hint">Utilisées par l'IA pour évaluer la correspondance avec les candidats.</p>
+
+          @if (competencesSelectionnees().length) {
+            <div class="competences-selected">
+              @for (competence of competencesSelectionnees(); track competence.id) {
+                <div class="competence-chip">
+                  <span>{{ competence.nom }}</span>
+                  <button
+                    type="button"
+                    class="competence-chip__remove"
+                    (click)="toggleCompetence(competence.id)"
+                    aria-label="Retirer cette compétence"
+                  >
+                    ×
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="competence-search">
+            <input
+              type="text"
+              placeholder="Ex : Python, Gestion de projet, Photoshop..."
+              [(ngModel)]="rechercheCompetence"
+              [ngModelOptions]="{ standalone: true }"
+              (keyup.enter)="ajouterCompetence()"
+            />
+            <button
+              class="btn btn-outline"
+              type="button"
+              (click)="ajouterCompetence()"
+              [disabled]="!rechercheCompetence.trim() || ajoutCompetenceEnCours()"
+            >
+              {{ ajoutCompetenceEnCours() ? 'Ajout...' : 'Ajouter' }}
+            </button>
+          </div>
+
+          @if (suggestionsCompetences().length) {
+            <div class="competence-suggestions">
+              @for (suggestion of suggestionsCompetences(); track suggestion.id) {
+                <button type="button" class="chip" (click)="selectionnerSuggestion(suggestion)">
+                  {{ suggestion.nom }}
+                </button>
+              }
+            </div>
+          }
+
+          <p class="section-label" style="margin-top: 12px">Ou choisissez parmi les compétences existantes</p>
+          <div class="competences-grid">
+            @for (competence of toutesCompetences(); track competence.id) {
+              <label class="checkbox-field competence-row" [class.active]="estCompetenceSelectionnee(competence.id)">
+                <input
+                  type="checkbox"
+                  [checked]="estCompetenceSelectionnee(competence.id)"
+                  (change)="toggleCompetence(competence.id)"
+                />
+                {{ competence.nom }}
+              </label>
+            }
+          </div>
+        </div>
+
         <div class="form-actions">
           <button class="btn btn-outline" type="button" (click)="annuler()">Annuler</button>
           <button class="btn btn-primary" type="submit" [disabled]="saving()">

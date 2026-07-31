@@ -1,3 +1,11 @@
+/* ---- Stat cards ---- */
+.stat-card__unit {
+  font-size: 0.9rem;
+  color: var(--gray-400);
+  font-weight: 500;
+}
+
+/* ---- Profile card ---- */
 .force-header {
   display: flex;
   align-items: center;
@@ -28,6 +36,7 @@
   height: 100%;
   background: var(--primary);
   border-radius: 999px;
+  transition: width 0.4s ease;
 }
 
 .section-label {
@@ -85,6 +94,7 @@
   margin-top: 2px;
 }
 
+/* ---- Section title ---- */
 .section-title {
   display: flex;
   align-items: center;
@@ -104,22 +114,85 @@
   text-decoration: none;
 }
 
+.section-title a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Job cards (Recommandé pour vous) ---- */
+.job-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.job-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: 0 10px 24px -14px rgba(37, 99, 235, 0.5);
+}
+
 .job-card__top {
-  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.job-card__logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 
 .job-card__title {
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 4px;
+  line-height: 1.3;
 }
 
 .job-card__meta {
   color: var(--gray-500);
   font-size: 0.82rem;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
+.job-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.tag {
+  background: var(--gray-100);
+  color: var(--gray-600);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.job-card__cta {
+  margin-top: auto;
+  pointer-events: none;
+}
+
+/* ---- Messages / employability legacy blocks (charts section) ---- */
 .messages-count,
 .employability-score {
   margin-top: 8px;

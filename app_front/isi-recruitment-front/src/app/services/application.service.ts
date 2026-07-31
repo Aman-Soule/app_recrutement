@@ -30,6 +30,14 @@ export class ApplicationService {
     return this.http.get<Application>(`${API_BASE_URL}/candidat/candidatures/${applicationId}`);
   }
 
+  /** Candidat : relancer le calcul du score IA après un échec */
+  relancerScoreIa(applicationId: number): Observable<Application> {
+    return this.http.post<Application>(
+      `${API_BASE_URL}/candidat/candidatures/${applicationId}/relancer-score-ia`,
+      {},
+    );
+  }
+
   /** Recruteur : candidatures reçues sur une offre précise */
   parOffre(jobOfferId: number, page = 1): Observable<PaginatedResponse<Application>> {
     const params = new HttpParams().set('page', page);

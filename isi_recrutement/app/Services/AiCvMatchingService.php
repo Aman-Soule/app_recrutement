@@ -53,7 +53,7 @@ class AiCvMatchingService
 
     private function analyserAvecGemini(CandidateProfile $profil, JobOffer $offre, string $texteCv): array
     {
-        $competencesRequises = Skill::whereIn('id', $offre->competences_requises ?? [])->pluck('nom')->all();
+        $competencesRequises = Skill::whereIn('id', $this->idsCompetencesRequises($offre))->pluck('nom')->all();
 
         $prompt = <<<PROMPT
             Tu es un assistant de recrutement. Compare le CV d'un candidat à une offre d'emploi et évalue leur
@@ -108,7 +108,7 @@ class AiCvMatchingService
     private function scoreDeSecours(CandidateProfile $profil, JobOffer $offre): AiMatchScore
     {
         $nomsCandidat = $profil->competences->pluck('nom')->all();
-        $nomsRequis = Skill::whereIn('id', $offre->competences_requises ?? [])->pluck('nom')->all();
+        $nomsRequis = Skill::whereIn('id', $this->idsCompetencesRequises($offre))->pluck('nom')->all();
 
         return AiMatchScore::updateOrCreate(
             ['candidate_profile_id' => $profil->id, 'job_offer_id' => $offre->id],
@@ -125,6 +125,15 @@ class AiCvMatchingService
                 'calcule_le' => now(),
             ],
         );
+    }
+
+    /** IDs numériques valides dans competences_requises (le champ peut contenir des données mal formées, ex. des noms) */
+    private function idsCompetencesRequises(JobOffer $offre): array
+    {
+        return array_values(array_filter(
+            $offre->competences_requises ?? [],
+            fn($id) => is_numeric($id),
+        ));
     }
 
     private function listeOuAucune(array $valeurs): string

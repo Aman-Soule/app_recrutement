@@ -1,15 +1,82 @@
 <div class="page">
-  <div class="page-header">
-    <div>
-      <h1>Tableau de bord</h1>
-      <p>Suivez vos candidatures et découvrez de nouvelles opportunités.</p>
+  <div class="hero">
+    <div class="hero__text">
+      <p class="hero__eyebrow">Tableau de bord</p>
+      <h1>
+        @if (prenomCandidat()) {
+          Bonjour {{ prenomCandidat() }}
+        } @else {
+          Bonjour
+        }
+      </h1>
+      <p class="hero__subtitle">
+        Suivez vos candidatures et découvrez les opportunités qui vous correspondent.
+      </p>
+    </div>
+    <div class="hero__actions">
+      <a routerLink="/candidate/jobs" class="btn btn-primary">Trouver des offres</a>
+      <a routerLink="/candidate/profile" class="btn hero__btn-ghost">Compléter mon profil</a>
     </div>
   </div>
 
-  <div class="grid grid-2">
+  <div class="grid grid-4">
+    <div class="card stat-card">
+      <div class="stat-card__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3.2 1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div>
+        <div class="stat-card__value">{{ profil()?.force_profil ?? 0 }}%</div>
+        <div class="stat-card__label">Force du profil</div>
+      </div>
+    </div>
+
+    <div class="card stat-card">
+      <div class="stat-card__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 17l5-5 4 4 8-8" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M14 8h6v6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div>
+        <div class="stat-card__value">{{ profil()?.score_employabilite ?? 0 }}<span class="stat-card__unit">/100</span></div>
+        <div class="stat-card__label">Score d'employabilité</div>
+      </div>
+    </div>
+
+    <div class="card stat-card">
+      <div class="stat-card__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 5h16v11H8l-4 4V5Z" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div>
+        <div class="stat-card__value">{{ messagesNonLus() }}</div>
+        <div class="stat-card__label">Message(s) non lu(s)</div>
+      </div>
+    </div>
+
+    <div class="card stat-card">
+      <div class="stat-card__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="7" width="18" height="13" rx="2" />
+          <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          <path d="M3 13h18" />
+        </svg>
+      </div>
+      <div>
+        <div class="stat-card__value">{{ candidatures().length }}</div>
+        <div class="stat-card__label">Candidature(s) envoyée(s)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top: 20px">
     <div class="card">
       <div class="force-header">
-        <h2>Force du profil</h2>
+        <h2>Mon profil</h2>
         <span class="force-value">{{ profil()?.force_profil ?? 0 }}%</span>
       </div>
       <p class="force-subtitle">Boostez votre visibilité auprès des recruteurs</p>
@@ -69,42 +136,40 @@
     <a routerLink="/candidate/jobs">Voir toutes les offres</a>
   </div>
 
-  @if (erreurPostulation()) {
-    <div class="alert alert-error" style="margin-bottom: 16px">{{ erreurPostulation() }}</div>
+  @if (chargementOffres()) {
+    <p class="loading-state">Chargement des recommandations...</p>
+  } @else {
+    <div class="grid grid-4">
+      @for (offre of offresPourVous(); track offre.id) {
+        <a [routerLink]="['/candidate/jobs', offre.id]" class="card job-card">
+          <div class="job-card__top">
+            <span class="job-card__logo">{{ initiales(offre.entreprise?.nom) }}</span>
+            @if (offre.score_matching !== undefined) {
+              <span class="badge" [ngClass]="matchClass(offre.score_matching)">
+                Match {{ offre.score_matching }}%
+              </span>
+            }
+          </div>
+          <p class="job-card__title">{{ offre.titre }}</p>
+          <p class="job-card__meta">{{ offre.entreprise?.nom }} · {{ offre.localisation }}</p>
+          <div class="job-card__tags">
+            @if (offre.type_contrat) {
+              <span class="tag">{{ libelleContrat(offre.type_contrat) }}</span>
+            }
+            @if (offre.type_lieu) {
+              <span class="tag">{{ libelleLieu(offre.type_lieu) }}</span>
+            }
+          </div>
+          <span class="btn btn-primary btn-block job-card__cta">Voir l'offre</span>
+        </a>
+      } @empty {
+        <p class="empty-state">
+          Aucune nouvelle recommandation pour l'instant. Complétez votre profil pour de meilleures suggestions,
+          ou parcourez toutes les offres disponibles.
+        </p>
+      }
+    </div>
   }
-
-  <div class="grid grid-4">
-    @for (offre of offresRecommandees(); track offre.id) {
-      <div class="card job-card">
-        <div class="job-card__top">
-          <span class="badge badge-success">Match {{ offre.score_matching }}%</span>
-        </div>
-        <p class="job-card__title">{{ offre.titre }}</p>
-        <p class="job-card__meta">{{ offre.entreprise?.nom }} · {{ offre.localisation }}</p>
-        <button
-          class="btn btn-primary btn-block"
-          [disabled]="postulationEnCours() === offre.id"
-          (click)="postuler(offre)"
-        >
-          {{ postulationEnCours() === offre.id ? 'Envoi...' : 'Postuler avec TalentAI' }}
-        </button>
-      </div>
-    } @empty {
-      <p class="empty-state">Aucune recommandation pour l'instant. Complétez votre profil pour de meilleures suggestions.</p>
-    }
-  </div>
-
-  <div class="grid grid-2" style="margin-top: 24px">
-    <div class="card">
-      <h2>Messages</h2>
-      <p class="messages-count">{{ messagesNonLus() }} message(s) non lu(s)</p>
-    </div>
-
-    <div class="card">
-      <h2>Employabilité</h2>
-      <p class="employability-score">{{ profil()?.score_employabilite ?? 0 }}<span>/100</span></p>
-    </div>
-  </div>
 
   <div class="grid grid-2" style="margin-top: 24px">
     <div class="card">

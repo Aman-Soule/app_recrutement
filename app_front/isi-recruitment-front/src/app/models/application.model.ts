@@ -36,6 +36,7 @@ export interface Application {
   job_offer_id: number;
   statut: StatutCandidature;
   score_matching_ia: number | null;
+  score_ia_erreur: string | null;
   lettre_motivation: string | null;
   cv_url: string | null;
   notes_recruteur: string | null;

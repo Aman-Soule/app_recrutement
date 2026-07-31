@@ -5,6 +5,21 @@
       Analyse IA en cours…
     </span>
   </div>
+} @else if (erreur) {
+  <div class="ai-score">
+    <span class="badge badge-danger ai-score__error">Analyse IA indisponible</span>
+    <p class="ai-score__note">{{ erreur }}</p>
+    @if (peutReessayer) {
+      <button
+        type="button"
+        class="btn btn-outline btn-sm ai-score__retry"
+        [disabled]="relanceEnCours"
+        (click)="reessayer.emit()"
+      >
+        {{ relanceEnCours ? 'Relance en cours...' : 'Réessayer' }}
+      </button>
+    }
+  </div>
 } @else if (!score) {
   <span class="badge badge-neutral">—</span>
 } @else {

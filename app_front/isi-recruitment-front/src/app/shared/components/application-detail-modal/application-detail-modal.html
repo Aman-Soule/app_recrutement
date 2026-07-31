@@ -55,7 +55,8 @@
         <h3>Score IA</h3>
         <app-ai-score-detail
           [score]="application.score_detaille"
-          [enAttente]="application.score_matching_ia === null"
+          [enAttente]="application.score_matching_ia === null && !application.score_ia_erreur"
+          [erreur]="application.score_ia_erreur"
         />
       </div>
 

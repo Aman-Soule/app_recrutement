@@ -77,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/candidat/candidatures',        [ApplicationController::class, 'mesCandidatures']);
         Route::get('/candidat/candidatures/{application}', [ApplicationController::class, 'voir']);
         Route::post('/offres/{jobOffer}/postuler',  [ApplicationController::class, 'store']);
+        Route::post('/candidat/candidatures/{application}/relancer-score-ia', [ApplicationController::class, 'relancerScoreIa']);
 
         // Entretiens
         Route::put('/candidat/entretiens/{interview}/confirmer', [InterviewController::class, 'confirmer']);

@@ -26,6 +26,7 @@ export class ApplicationDetail implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly errorMessage = signal<string | null>(null);
   readonly confirmingId = signal<number | null>(null);
+  readonly relanceScoreEnCours = signal(false);
 
   readonly libelles = LIBELLES_STATUT_CANDIDATURE;
   readonly libellesEtape = LIBELLES_ETAPE_ENTRETIEN;
@@ -58,7 +59,9 @@ export class ApplicationDetail implements OnInit, OnDestroy {
 
   /** Tant que le score IA n'est pas encore calculé (analyse en cours), on recharge périodiquement */
   private gererPollingScore(application: Application): void {
-    if (application.score_matching_ia !== null || this.tentativesPolling >= POLLING_MAX_TENTATIVES) {
+    const termine = application.score_matching_ia !== null || !!application.score_ia_erreur;
+
+    if (termine || this.tentativesPolling >= POLLING_MAX_TENTATIVES) {
       if (this.intervalId) {
         clearInterval(this.intervalId);
         this.intervalId = undefined;
@@ -78,6 +81,21 @@ export class ApplicationDetail implements OnInit, OnDestroy {
         });
       }, INTERVALLE_POLLING_MS);
     }
+  }
+
+  relancerScoreIa(): void {
+    if (this.relanceScoreEnCours()) return;
+
+    this.relanceScoreEnCours.set(true);
+    this.applicationService.relancerScoreIa(this.applicationId).subscribe({
+      next: (application) => {
+        this.relanceScoreEnCours.set(false);
+        this.application.set(application);
+        this.tentativesPolling = 0;
+        this.gererPollingScore(application);
+      },
+      error: () => this.relanceScoreEnCours.set(false),
+    });
   }
 
   badgeClass(statut: StatutCandidature): string {

@@ -7,15 +7,14 @@ import { CandidateProfileService } from '../../../services/candidate-profile.ser
 import { ApplicationService } from '../../../services/application.service';
 import { JobService } from '../../../services/job.service';
 import { MessageService } from '../../../services/message.service';
-import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
-import { CandidateProfile, NiveauCompetence } from '../../../models/user.model';
+import { AuthService } from '../../../services/auth';
+import { CandidateProfile, NiveauCompetence, TypeContrat, TypeLieu } from '../../../models/user.model';
 import {
   Application,
   LIBELLES_STATUT_CANDIDATURE,
   StatutCandidature,
 } from '../../../models/application.model';
 import { JobOffer } from '../../../models/job.model';
-import { extractErrorMessage } from '../../../services/api';
 
 const NIVEAUX: NiveauCompetence[] = ['debutant', 'intermediaire', 'avance', 'expert'];
 const LIBELLES_NIVEAU: Record<NiveauCompetence, string> = {
@@ -23,6 +22,19 @@ const LIBELLES_NIVEAU: Record<NiveauCompetence, string> = {
   intermediaire: 'Intermédiaire',
   avance: 'Avancé',
   expert: 'Expert',
+};
+
+const LIBELLES_TYPE_CONTRAT: Record<TypeContrat, string> = {
+  temps_plein: 'Temps plein',
+  temps_partiel: 'Temps partiel',
+  freelance: 'Freelance',
+  stage: 'Stage',
+};
+
+const LIBELLES_TYPE_LIEU: Record<TypeLieu, string> = {
+  teletravail: 'Télétravail',
+  hybride: 'Hybride',
+  presentiel: 'Présentiel',
 };
 
 const NOMBRE_CANDIDATURES_RECENTES = 4;
@@ -39,16 +51,20 @@ export class Dashboard implements OnInit {
   private applicationService = inject(ApplicationService);
   private jobService = inject(JobService);
   private messageService = inject(MessageService);
-  private confirmDialog = inject(ConfirmDialogService);
+  private authService = inject(AuthService);
 
   readonly profil = signal<CandidateProfile | null>(null);
   readonly candidatures = signal<Application[]>([]);
   readonly offresRecommandees = signal<JobOffer[]>([]);
   readonly messagesNonLus = signal(0);
-  readonly postulationEnCours = signal<number | null>(null);
-  readonly erreurPostulation = signal<string | null>(null);
+  readonly chargementOffres = signal(true);
 
   readonly libelles = LIBELLES_STATUT_CANDIDATURE;
+
+  readonly prenomCandidat = computed(() => {
+    const nom = this.authService.currentUser()?.name;
+    return nom ? nom.split(' ')[0] : '';
+  });
 
   readonly candidaturesRecentes = computed(() =>
     this.candidatures().slice(0, NOMBRE_CANDIDATURES_RECENTES),
@@ -57,6 +73,14 @@ export class Dashboard implements OnInit {
   readonly competencesVerifiees = computed(
     () => this.profil()?.competences?.filter((c) => c.pivot?.verifie) ?? [],
   );
+
+  /** Offres recommandées auxquelles le candidat n'a pas encore postulé. */
+  readonly offresPourVous = computed(() => {
+    const idsPostules = new Set(this.candidatures().map((c) => c.job_offer_id));
+    return this.offresRecommandees()
+      .filter((offre) => !idsPostules.has(offre.id))
+      .slice(0, NOMBRE_OFFRES_RECOMMANDEES);
+  });
 
   readonly forceProfilChartData = computed<ChartConfiguration<'doughnut'>['data']>(() => {
     const force = this.profil()?.force_profil ?? 0;
@@ -126,36 +150,14 @@ export class Dashboard implements OnInit {
   }
 
   private chargerOffresRecommandees(): void {
+    this.chargementOffres.set(true);
     this.jobService.recommandees().subscribe({
-      next: (offres) => this.offresRecommandees.set(offres.slice(0, NOMBRE_OFFRES_RECOMMANDEES)),
-      error: () => {},
+      next: (offres) => {
+        this.offresRecommandees.set(offres);
+        this.chargementOffres.set(false);
+      },
+      error: () => this.chargementOffres.set(false),
     });
-  }
-
-  async postuler(offre: JobOffer): Promise<void> {
-    const ok = await this.confirmDialog.confirm({
-      title: 'Envoyer ma candidature',
-      message: `Confirmer l'envoi de votre candidature pour "${offre.titre}" chez ${offre.entreprise?.nom ?? "l'entreprise"} ? Vous ne pourrez pas la retirer une fois envoyée.`,
-      confirmLabel: 'Envoyer ma candidature',
-    });
-    if (!ok) return;
-
-    this.postulationEnCours.set(offre.id);
-    this.erreurPostulation.set(null);
-
-    this.applicationService
-      .postuler(offre.id, { cv_url: this.profil()?.cv_url ?? undefined })
-      .subscribe({
-        next: (res) => {
-          this.candidatures.update((liste) => [res.candidature, ...liste]);
-          this.offresRecommandees.update((offres) => offres.filter((o) => o.id !== offre.id));
-          this.postulationEnCours.set(null);
-        },
-        error: (err) => {
-          this.erreurPostulation.set(extractErrorMessage(err));
-          this.postulationEnCours.set(null);
-        },
-      });
   }
 
   badgeClass(statut: StatutCandidature): string {
@@ -170,5 +172,30 @@ export class Dashboard implements OnInit {
       default:
         return 'badge-neutral';
     }
+  }
+
+  matchClass(score: number | undefined): string {
+    const s = score ?? 0;
+    if (s >= 80) return 'badge-success';
+    if (s >= 50) return 'badge-info';
+    return 'badge-warning';
+  }
+
+  libelleContrat(type: TypeContrat | null | undefined): string {
+    return type ? (LIBELLES_TYPE_CONTRAT[type] ?? type) : '';
+  }
+
+  libelleLieu(type: TypeLieu | null | undefined): string {
+    return type ? (LIBELLES_TYPE_LIEU[type] ?? type) : '';
+  }
+
+  initiales(nom: string | undefined): string {
+    if (!nom) return '?';
+    return nom
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((mot) => mot[0]?.toUpperCase())
+      .join('');
   }
 }

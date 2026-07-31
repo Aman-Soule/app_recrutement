@@ -6,6 +6,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { JobService } from '../../../services/job.service';
 import { ApplicationService } from '../../../services/application.service';
 import { InterviewService } from '../../../services/interview.service';
+import { AuthService } from '../../../services/auth';
 import {
   Application,
   LIBELLES_STATUT_CANDIDATURE,
@@ -24,8 +25,14 @@ export class Dashboard implements OnInit {
   private jobService = inject(JobService);
   private applicationService = inject(ApplicationService);
   private interviewService = inject(InterviewService);
+  private authService = inject(AuthService);
 
   readonly libelles = LIBELLES_STATUT_CANDIDATURE;
+
+  readonly prenom = computed(() => {
+    const nom = this.authService.currentUser()?.name;
+    return nom ? nom.split(' ')[0] : '';
+  });
 
   readonly offresActives = signal(0);
   readonly offresBrouillons = signal(0);

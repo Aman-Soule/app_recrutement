@@ -51,6 +51,7 @@ class JobOfferController extends Controller
             'salaire_max'         => 'nullable|string',
             'statut'              => 'nullable|in:brouillon,actif,ferme',
             'competences_requises' => 'nullable|array',
+            'competences_requises.*' => 'integer|exists:skills,id',
             'date_cloture'        => 'nullable|date',
         ]);
 
@@ -83,6 +84,7 @@ class JobOfferController extends Controller
             'titre'                => 'nullable|string|max:255',
             'statut'               => 'nullable|in:brouillon,actif,ferme',
             'competences_requises' => 'nullable|array',
+            'competences_requises.*' => 'integer|exists:skills,id',
             'date_cloture'         => 'nullable|date',
         ]);
 

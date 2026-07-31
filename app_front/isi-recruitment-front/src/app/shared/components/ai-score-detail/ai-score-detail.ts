@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AiMatchScore } from '../../../models/application.model';
 import { MatchScore } from '../match-score/match-score';
 
@@ -16,6 +16,11 @@ interface SousScore {
 export class AiScoreDetail {
   @Input({ required: true }) score: AiMatchScore | null | undefined;
   @Input() enAttente = false;
+  @Input() erreur: string | null | undefined;
+  /** Affiche un bouton "Réessayer" en cas d'échec (réservé à la page candidat, propriétaire de la candidature) */
+  @Input() peutReessayer = false;
+  @Input() relanceEnCours = false;
+  @Output() reessayer = new EventEmitter<void>();
 
   sousScores(): SousScore[] {
     if (!this.score) return [];

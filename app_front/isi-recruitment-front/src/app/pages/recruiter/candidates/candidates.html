@@ -115,7 +115,9 @@
               <p class="kanban-card__meta">{{ candidature.offre?.titre }}</p>
               <p class="kanban-card__meta">{{ candidature.postule_le | date: 'dd/MM/yyyy' }}</p>
               <div class="kanban-card__footer">
-                @if (candidature.score_matching_ia === null) {
+                @if (candidature.score_ia_erreur) {
+                  <span class="badge badge-danger">Analyse IA indisponible</span>
+                } @else if (candidature.score_matching_ia === null) {
                   <span class="badge badge-neutral">Analyse en cours…</span>
                 } @else {
                   <app-match-score [score]="candidature.score_matching_ia" label="IA" />

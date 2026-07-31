@@ -1,10 +1,12 @@
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { JobService } from '../../../services/job.service';
+import { SkillService } from '../../../services/skill.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { JobOffer, StatutOffre } from '../../../models/job.model';
+import { Skill } from '../../../models/user.model';
 import { extractErrorMessage } from '../../../services/api';
 
 type Onglet = 'toutes' | 'actif' | 'ferme' | 'brouillon';
@@ -18,13 +20,14 @@ const COLONNES_KANBAN: { statut: StatutOffre; label: string }[] = [
 
 @Component({
   selector: 'app-jobs',
-  imports: [ReactiveFormsModule, DatePipe, NgClass],
+  imports: [ReactiveFormsModule, FormsModule, DatePipe, NgClass],
   templateUrl: './jobs.html',
   styleUrl: './jobs.scss',
 })
 export class Jobs implements OnInit {
   private fb = inject(FormBuilder);
   private jobService = inject(JobService);
+  private skillService = inject(SkillService);
   private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
 
@@ -37,7 +40,27 @@ export class Jobs implements OnInit {
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  readonly toutesCompetences = signal<Skill[]>([]);
+  readonly competencesRequisesIds = signal<number[]>([]);
+  readonly ajoutCompetenceEnCours = signal(false);
+  rechercheCompetence = '';
+
   readonly colonnesKanban = COLONNES_KANBAN;
+
+  readonly suggestionsCompetences = computed<Skill[]>(() => {
+    const recherche = this.rechercheCompetence.trim().toLowerCase();
+    if (!recherche) return [];
+    return this.toutesCompetences()
+      .filter((c) => c.nom.toLowerCase().includes(recherche) && !this.estCompetenceSelectionnee(c.id))
+      .slice(0, 6);
+  });
+
+  readonly competencesSelectionnees = computed<Skill[]>(() => {
+    const toutes = this.toutesCompetences();
+    return this.competencesRequisesIds()
+      .map((id) => toutes.find((c) => c.id === id))
+      .filter((c): c is Skill => c !== undefined);
+  });
 
   readonly offresParColonne = computed(() => {
     const offres = this.offres();
@@ -60,6 +83,10 @@ export class Jobs implements OnInit {
 
   ngOnInit(): void {
     this.charger();
+    this.skillService.list().subscribe({
+      next: (skills) => this.toutesCompetences.set(skills),
+      error: () => {},
+    });
   }
 
   charger(): void {
@@ -101,6 +128,8 @@ export class Jobs implements OnInit {
       statut: 'brouillon',
       date_cloture: '',
     });
+    this.competencesRequisesIds.set([]);
+    this.rechercheCompetence = '';
     this.showForm.set(true);
   }
 
@@ -116,12 +145,60 @@ export class Jobs implements OnInit {
       statut: offre.statut,
       date_cloture: offre.date_cloture ?? '',
     });
+    this.competencesRequisesIds.set(offre.competences_requises ?? []);
+    this.rechercheCompetence = '';
     this.showForm.set(true);
   }
 
   annuler(): void {
     this.showForm.set(false);
     this.errorMessage.set(null);
+  }
+
+  estCompetenceSelectionnee(skillId: number): boolean {
+    return this.competencesRequisesIds().includes(skillId);
+  }
+
+  toggleCompetence(skillId: number): void {
+    if (this.estCompetenceSelectionnee(skillId)) {
+      this.competencesRequisesIds.update((ids) => ids.filter((id) => id !== skillId));
+    } else {
+      this.competencesRequisesIds.update((ids) => [...ids, skillId]);
+    }
+  }
+
+  selectionnerSuggestion(skill: Skill): void {
+    if (!this.estCompetenceSelectionnee(skill.id)) {
+      this.competencesRequisesIds.update((ids) => [...ids, skill.id]);
+    }
+    this.rechercheCompetence = '';
+  }
+
+  /** Ajoute la compétence saisie : la sélectionne si elle existe déjà, sinon la crée. */
+  ajouterCompetence(): void {
+    const nom = this.rechercheCompetence.trim();
+    if (!nom) return;
+
+    const existante = this.toutesCompetences().find((c) => c.nom.toLowerCase() === nom.toLowerCase());
+    if (existante) {
+      this.selectionnerSuggestion(existante);
+      return;
+    }
+
+    this.ajoutCompetenceEnCours.set(true);
+    this.errorMessage.set(null);
+    this.skillService.create(nom).subscribe({
+      next: (res) => {
+        this.toutesCompetences.update((list) => [...list, res.competence]);
+        this.competencesRequisesIds.update((ids) => [...ids, res.competence.id]);
+        this.rechercheCompetence = '';
+        this.ajoutCompetenceEnCours.set(false);
+      },
+      error: (err) => {
+        this.ajoutCompetenceEnCours.set(false);
+        this.errorMessage.set(extractErrorMessage(err));
+      },
+    });
   }
 
   async enregistrer(): Promise<void> {
@@ -137,7 +214,10 @@ export class Jobs implements OnInit {
 
     this.saving.set(true);
     this.errorMessage.set(null);
-    const payload = this.form.getRawValue() as Partial<JobOffer> & { statut: StatutOffre };
+    const payload = {
+      ...this.form.getRawValue(),
+      competences_requises: this.competencesRequisesIds(),
+    } as Partial<JobOffer> & { statut: StatutOffre };
 
     const requete = id ? this.jobService.update(id, payload) : this.jobService.create(payload);
 

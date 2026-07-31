@@ -11,6 +11,7 @@ class Application extends Model
         'job_offer_id',
         'statut',
         'score_matching_ia',
+        'score_ia_erreur',
         'lettre_motivation',
         'cv_url',
         'notes_recruteur',

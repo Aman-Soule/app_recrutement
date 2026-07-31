@@ -28,8 +28,14 @@ class ScannerCandidatureJob implements ShouldQueue
             return;
         }
 
-        $score = $service->scanner($candidature->candidat, $candidature->offre);
+        try {
+            $score = $service->scanner($candidature->candidat, $candidature->offre);
+        } catch (\Throwable $e) {
+            Log::error("ScannerCandidatureJob : échec du calcul du score pour la candidature {$this->applicationId} : " . $e->getMessage());
+            $candidature->update(['score_ia_erreur' => "Le calcul du score IA a échoué. Réessayez plus tard."]);
+            return;
+        }
 
-        $candidature->update(['score_matching_ia' => $score->score_global]);
+        $candidature->update(['score_matching_ia' => $score->score_global, 'score_ia_erreur' => null]);
     }
 }

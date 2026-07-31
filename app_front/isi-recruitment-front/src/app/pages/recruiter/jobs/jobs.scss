@@ -20,3 +20,104 @@
 .clickable-row {
   cursor: pointer;
 }
+
+.field-hint {
+  font-size: 0.78rem;
+  color: var(--gray-500);
+  margin: 2px 0 8px;
+}
+
+.section-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--gray-500);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.competences-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.competence-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+}
+
+.competence-row.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.competences-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.competence-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 6px 6px 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.competence-chip__remove {
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.competence-search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.competence-search input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.competence-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.chip {
+  border: 1px solid var(--gray-300);
+  background: #fff;
+  color: var(--gray-700);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}

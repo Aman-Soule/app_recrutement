@@ -1,9 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AdminStatsService } from '../../../services/admin-stats.service';
 import { AdminCompanyService } from '../../../services/admin-company.service';
 import { AdminStats, Company } from '../../../models/user.model';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -14,11 +15,17 @@ import { AdminStats, Company } from '../../../models/user.model';
 export class Dashboard implements OnInit {
   private statsService = inject(AdminStatsService);
   private companyService = inject(AdminCompanyService);
+  private authService = inject(AuthService);
 
   readonly loading = signal(true);
   readonly stats = signal<AdminStats | null>(null);
   readonly entreprises = signal<Company[]>([]);
   selectedCompanyId: number | null = null;
+
+  readonly prenom = computed(() => {
+    const nom = this.authService.currentUser()?.name;
+    return nom ? nom.split(' ')[0] : '';
+  });
 
   ngOnInit(): void {
     this.companyService.list().subscribe({

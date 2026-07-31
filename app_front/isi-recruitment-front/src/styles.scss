@@ -128,11 +128,87 @@ a {
   color: var(--gray-900);
 }
 
+/* ---- Hero (bandeau de bienvenue en tête de tableau de bord) ---- */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #4f8cff 100%);
+  border-radius: 16px;
+  padding: 32px 36px;
+  margin-bottom: 24px;
+  color: #fff;
+  box-shadow: 0 12px 28px -12px rgba(37, 99, 235, 0.45);
+}
+
+.hero__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 6px;
+}
+
+.hero__text h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.hero__subtitle {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.925rem;
+  max-width: 460px;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero__actions .btn-primary {
+  background: #fff;
+  color: var(--primary-dark);
+}
+
+.hero__actions .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.hero__btn-ghost {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.hero__btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+@media (max-width: 700px) {
+  .hero {
+    padding: 24px;
+  }
+}
+
 /* ---- Stat card ---- */
 .stat-card {
   display: flex;
   align-items: center;
   gap: 14px;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -14px rgba(37, 99, 235, 0.35);
 }
 
 .stat-card__icon {

@@ -83,6 +83,27 @@ class ApplicationController extends Controller
         return response()->json($application);
     }
 
+    /** Candidat : relancer le calcul du score IA après un échec (ou un blocage) */
+    public function relancerScoreIa(Request $request, Application $application)
+    {
+        if ($application->candidate_profile_id !== $request->user()->profilCandidat->id) {
+            abort(403, "Vous n'avez pas accès à cette candidature.");
+        }
+
+        if ($application->score_matching_ia !== null) {
+            return response()->json(['message' => 'Le score IA a déjà été calculé.'], 409);
+        }
+
+        $application->update(['score_ia_erreur' => null]);
+
+        ScannerCandidatureJob::dispatch($application->id);
+
+        $application->refresh()->load('offre.entreprise', 'entretiens.recruteur.utilisateur');
+        $this->attacherScoreDetaille($application);
+
+        return response()->json($application);
+    }
+
     /** Recruteur : voir les candidatures pour une offre */
     public function parOffre(Request $request, JobOffer $jobOffer)
     {

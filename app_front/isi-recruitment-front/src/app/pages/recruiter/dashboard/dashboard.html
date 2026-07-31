@@ -1,10 +1,20 @@
 <div class="page">
-  <div class="page-header">
-    <div>
-      <h1>Tableau de bord Recruteur</h1>
-      <p>Voici l'activité de votre équipe de recrutement.</p>
+  <div class="hero">
+    <div class="hero__text">
+      <p class="hero__eyebrow">Tableau de bord</p>
+      <h1>
+        @if (prenom()) {
+          Bonjour {{ prenom() }}
+        } @else {
+          Bonjour
+        }
+      </h1>
+      <p class="hero__subtitle">Voici l'activité de votre équipe de recrutement.</p>
     </div>
-    <a routerLink="/recruiter/jobs" class="btn btn-primary">+ Nouvelle offre</a>
+    <div class="hero__actions">
+      <a routerLink="/recruiter/jobs" class="btn btn-primary">+ Nouvelle offre</a>
+      <a routerLink="/recruiter/candidates" class="btn hero__btn-ghost">Voir les candidats</a>
+    </div>
   </div>
 
   <div class="grid grid-4">
