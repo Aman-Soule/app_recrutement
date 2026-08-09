@@ -16,6 +16,7 @@ export class VisitorJobDetail implements OnInit {
 
   readonly offre = signal<JobOffer | null>(null);
   readonly loading = signal(true);
+  readonly erreur = signal(false);
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -24,7 +25,10 @@ export class VisitorJobDetail implements OnInit {
         this.offre.set(offre);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => {
+        this.erreur.set(true);
+        this.loading.set(false);
+      },
     });
   }
 }

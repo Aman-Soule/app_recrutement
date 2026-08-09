@@ -37,6 +37,15 @@ Route::post('/login',    [AuthController::class, 'login']);
 
 /*
 |--------------------------------------------------------------------------
+| Offres d'emploi & entreprises (lecture publique — visiteurs inclus)
+|--------------------------------------------------------------------------
+*/
+Route::get('/offres',            [JobOfferController::class, 'index']);
+Route::get('/offres/{jobOffer}', [JobOfferController::class, 'show']);
+Route::get('/entreprises/{company}', [CompanyController::class, 'show']);
+
+/*
+|--------------------------------------------------------------------------
 | Routes protégées par Sanctum
 |--------------------------------------------------------------------------
 */
@@ -51,13 +60,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // ---- Compétences (tous les rôles) ----
     Route::get('/competences',  [SkillController::class, 'index']);
     Route::post('/competences', [SkillController::class, 'store']);
-
-    // ---- Offres d'emploi (lecture pour tous) ----
-    Route::get('/offres',            [JobOfferController::class, 'index']);
-    Route::get('/offres/{jobOffer}', [JobOfferController::class, 'show']);
-
-    // ---- Entreprise (lecture pour tous) ----
-    Route::get('/entreprises/{company}', [CompanyController::class, 'show']);
 
     /*
     |--------------------------------------------------------------------------

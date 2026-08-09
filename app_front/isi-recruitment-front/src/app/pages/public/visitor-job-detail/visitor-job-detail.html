@@ -5,6 +5,10 @@
 
   @if (loading()) {
     <p class="loading-state">Chargement de l'offre...</p>
+  } @else if (erreur()) {
+    <div class="alert alert-error">
+      Impossible de charger cette offre pour le moment. Réessayez dans quelques instants.
+    </div>
   } @else if (offre(); as offre) {
     <div class="page-header">
       <div>
