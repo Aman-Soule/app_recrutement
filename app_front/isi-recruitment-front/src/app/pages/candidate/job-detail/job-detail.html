@@ -73,7 +73,7 @@
             }
 
             <div class="field">
-              <label for="lettre">Lettre de motivation (optionnel)</label>
+              <label for="lettre">Message de motivation (optionnel)</label>
               <textarea
                 id="lettre"
                 rows="5"
@@ -82,7 +82,33 @@
               ></textarea>
             </div>
 
-            <button class="btn btn-primary" [disabled]="postulation()" (click)="postuler()">
+            <div class="attach-block">
+              <div class="attach-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+                  <path d="M14 3v5h5" />
+                </svg>
+              </div>
+              <div class="attach-info">
+                <p class="attach-title">Lettre de motivation (fichier, optionnel)</p>
+                @if (lettreMotivationFichier) {
+                  <p class="upload-hint">📎 {{ lettreMotivationFichier.name }}</p>
+                } @else {
+                  <p class="upload-hint">PDF, DOC ou DOCX, 5 Mo max.</p>
+                }
+              </div>
+              <label class="btn btn-outline btn-sm upload-label attach-btn">
+                {{ lettreMotivationFichier ? 'Remplacer' : 'Joindre' }}
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  hidden
+                  (change)="surLettreFichierSelectionnee($event)"
+                />
+              </label>
+            </div>
+
+            <button class="btn btn-primary btn-block apply-submit" [disabled]="postulation()" (click)="postuler()">
               {{ postulation() ? 'Envoi...' : 'Envoyer ma candidature' }}
             </button>
           }
@@ -118,4 +144,15 @@
   } @else {
     <p class="empty-state">Cette offre est introuvable.</p>
   }
+
+  <app-matching-modal
+    [open]="matchOpen()"
+    [phase]="matchPhase()"
+    [score]="matchScore()"
+    [matched]="matchMatched()"
+    [missing]="matchMissing()"
+    [resume]="matchResume()"
+    [offreTitre]="offre()?.titre ?? ''"
+    (closed)="fermerMatchModal()"
+  />
 </div>

@@ -53,15 +53,50 @@
           </thead>
           <tbody>
             @for (competence of competences(); track competence.id) {
-              <tr>
-                <td><strong>{{ competence.nom }}</strong></td>
-                <td>{{ competence.categorie || '—' }}</td>
-                <td class="actions">
-                  <button class="btn btn-outline btn-sm" (click)="supprimer(competence)">
-                    Supprimer
-                  </button>
-                </td>
-              </tr>
+              @if (editingId() === competence.id) {
+                <tr>
+                  <td>
+                    <input
+                      type="text"
+                      class="edit-input"
+                      [(ngModel)]="editNom"
+                      (keyup.enter)="enregistrer(competence)"
+                      (keyup.escape)="annulerEdition()"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      class="edit-input"
+                      placeholder="Catégorie"
+                      [(ngModel)]="editCategorie"
+                      (keyup.enter)="enregistrer(competence)"
+                      (keyup.escape)="annulerEdition()"
+                    />
+                  </td>
+                  <td class="actions">
+                    <button class="btn btn-primary btn-sm" [disabled]="saving()" (click)="enregistrer(competence)">
+                      Enregistrer
+                    </button>
+                    <button class="btn btn-outline btn-sm" [disabled]="saving()" (click)="annulerEdition()">
+                      Annuler
+                    </button>
+                  </td>
+                </tr>
+              } @else {
+                <tr>
+                  <td><strong>{{ competence.nom }}</strong></td>
+                  <td>{{ competence.categorie || '—' }}</td>
+                  <td class="actions">
+                    <button class="btn btn-outline btn-sm" (click)="commencerEdition(competence)">
+                      Modifier
+                    </button>
+                    <button class="btn btn-outline btn-sm" (click)="supprimer(competence)">
+                      Supprimer
+                    </button>
+                  </td>
+                </tr>
+              }
             } @empty {
               <tr>
                 <td colspan="3" class="empty-state">Aucune compétence pour l'instant.</td>

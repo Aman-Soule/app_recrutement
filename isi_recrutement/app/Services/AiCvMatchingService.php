@@ -23,15 +23,23 @@ class AiCvMatchingService
 
         $texteCv = $this->extracteur->extraire($profil->cv_url);
 
-        if (!$texteCv || !config('services.gemini.key')) {
-            return $this->scoreDeSecours($profil, $offre);
+        if (!$texteCv) {
+            $raison = $profil->cv_url
+                ? "le CV n'a pas pu être lu (format non pris en charge ou fichier illisible)"
+                : "aucun CV n'est disponible sur le profil";
+
+            return $this->scoreDeSecours($profil, $offre, $raison);
+        }
+
+        if (!config('services.gemini.key')) {
+            return $this->scoreDeSecours($profil, $offre, "l'analyse IA n'est pas configurée pour le moment (clé API manquante)");
         }
 
         try {
             $donnees = $this->analyserAvecGemini($profil, $offre, $texteCv);
         } catch (\Throwable $e) {
             Log::warning("Échec de l'analyse IA du CV (candidat {$profil->id}, offre {$offre->id}) : " . $e->getMessage());
-            return $this->scoreDeSecours($profil, $offre);
+            return $this->scoreDeSecours($profil, $offre, "l'analyse IA du CV a échoué, un score basé sur le profil a été utilisé");
         }
 
         return AiMatchScore::updateOrCreate(
@@ -54,10 +62,14 @@ class AiCvMatchingService
     private function analyserAvecGemini(CandidateProfile $profil, JobOffer $offre, string $texteCv): array
     {
         $competencesRequises = Skill::whereIn('id', $this->idsCompetencesRequises($offre))->pluck('nom')->all();
+        $competencesProfil = $profil->competences->pluck('nom')->all();
 
         $prompt = <<<PROMPT
             Tu es un assistant de recrutement. Compare le CV d'un candidat à une offre d'emploi et évalue leur
-            correspondance. Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans balises
+            correspondance. Analyse d'abord le texte du CV pour en extraire les compétences réellement
+            mentionnées, recoupe-les avec les compétences déclarées sur le profil du candidat (ci-dessous),
+            puis compare cet ensemble aux compétences requises par l'offre avant de calculer les scores.
+            Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans balises
             markdown, respectant exactement ce format :
             {
               "score_global": <entier 0-100>,
@@ -79,7 +91,10 @@ class AiCvMatchingService
             Type de contrat : {$offre->type_contrat}
             Salaire proposé : {$offre->salaire_min} - {$offre->salaire_max}
 
-            --- CV DU CANDIDAT ---
+            --- COMPÉTENCES DÉCLARÉES SUR LE PROFIL DU CANDIDAT ---
+            {$this->listeOuAucune($competencesProfil)}
+
+            --- CV DU CANDIDAT (texte extrait du fichier) ---
             {$texteCv}
             PROMPT;
 
@@ -104,8 +119,8 @@ class AiCvMatchingService
         ];
     }
 
-    /** Repli sans IA : score basé sur les données structurées du profil (pas de CV exploitable ou clé absente) */
-    private function scoreDeSecours(CandidateProfile $profil, JobOffer $offre): AiMatchScore
+    /** Repli sans IA : score basé sur les données structurées du profil (pas de CV exploitable, clé absente ou échec IA) */
+    private function scoreDeSecours(CandidateProfile $profil, JobOffer $offre, string $raison): AiMatchScore
     {
         $nomsCandidat = $profil->competences->pluck('nom')->all();
         $nomsRequis = Skill::whereIn('id', $this->idsCompetencesRequises($offre))->pluck('nom')->all();
@@ -120,7 +135,7 @@ class AiCvMatchingService
                 'score_salaire' => null,
                 'competences_matchees' => array_values(array_intersect($nomsRequis, $nomsCandidat)),
                 'competences_manquantes' => array_values(array_diff($nomsRequis, $nomsCandidat)),
-                'resume_ia' => "Score calculé à partir du profil (compétences, lieu, contrat) : CV non disponible pour l'analyse IA.",
+                'resume_ia' => "Score calculé à partir du profil (compétences, lieu, contrat) : {$raison}.",
                 'source' => 'heuristique',
                 'calcule_le' => now(),
             ],

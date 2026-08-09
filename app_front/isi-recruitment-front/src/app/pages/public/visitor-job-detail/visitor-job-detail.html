@@ -1,0 +1,83 @@
+<app-public-navbar />
+
+<div class="page">
+  <a routerLink="/" class="back-link">← Retour aux offres</a>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement de l'offre...</p>
+  } @else if (offre(); as offre) {
+    <div class="page-header">
+      <div>
+        <h1>{{ offre.titre }}</h1>
+        <p>{{ offre.entreprise?.nom }} · {{ offre.localisation || 'Lieu non précisé' }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="job-main">
+        <div class="card">
+          <div class="tag-row">
+            @if (offre.type_contrat) {
+              <span class="badge badge-info">{{ offre.type_contrat }}</span>
+            }
+            @if (offre.type_lieu) {
+              <span class="badge badge-info">{{ offre.type_lieu }}</span>
+            }
+            @if (offre.departement) {
+              <span class="badge badge-neutral">{{ offre.departement }}</span>
+            }
+            @if (offre.salaire_min || offre.salaire_max) {
+              <span class="badge badge-success">
+                {{ offre.salaire_min || '?' }} - {{ offre.salaire_max || '?' }}
+              </span>
+            }
+          </div>
+
+          @if (offre.description) {
+            <h2 class="section-title">Description du poste</h2>
+            <p class="job-text">{{ offre.description }}</p>
+          }
+
+          @if (offre.exigences) {
+            <h2 class="section-title">Profil recherché</h2>
+            <p class="job-text">{{ offre.exigences }}</p>
+          }
+        </div>
+
+        <div class="card apply-card">
+          <h2>Envie de postuler ?</h2>
+          <p class="job-row__meta">
+            Créez un compte candidat pour envoyer votre candidature à cette offre en quelques
+            secondes.
+          </p>
+          <a routerLink="/register" class="btn btn-primary" style="margin-top: 14px">
+            Créer un compte pour postuler
+          </a>
+          <p class="apply-card__login">
+            Déjà inscrit ? <a routerLink="/login">Connectez-vous</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="card company-card">
+        <h2>À propos de l'entreprise</h2>
+        @if (offre.entreprise; as entreprise) {
+          <p class="company-name">{{ entreprise.nom }}</p>
+          @if (entreprise.secteur) {
+            <p class="job-row__meta">{{ entreprise.secteur }}</p>
+          }
+          @if (entreprise.description) {
+            <p class="job-text">{{ entreprise.description }}</p>
+          }
+          @if (entreprise.localisation) {
+            <p class="job-row__meta">{{ entreprise.localisation }}</p>
+          }
+        } @else {
+          <p class="empty-state">Aucune information sur l'entreprise.</p>
+        }
+      </div>
+    </div>
+  } @else {
+    <p class="empty-state">Cette offre est introuvable.</p>
+  }
+</div>

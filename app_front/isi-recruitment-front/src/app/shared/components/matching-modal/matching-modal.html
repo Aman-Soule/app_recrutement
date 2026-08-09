@@ -1,0 +1,75 @@
+@if (open) {
+  <div class="matching-backdrop" (click)="phase !== 'calculating' && fermer()">
+    <div class="matching-panel" (click)="$event.stopPropagation()">
+      @if (phase !== 'calculating') {
+        <button type="button" class="matching-close" aria-label="Fermer" (click)="fermer()">×</button>
+      }
+
+      <p class="matching-offre">{{ offreTitre }}</p>
+
+      <div class="matching-ring-wrap" [class.matching-ring-wrap--reveal]="justRevealed">
+        <svg viewBox="0 0 120 120" class="matching-ring">
+          <circle class="ring-track" cx="60" cy="60" r="54" />
+          <circle
+            class="ring-bar"
+            [ngClass]="couleurClasse()"
+            cx="60"
+            cy="60"
+            r="54"
+            [attr.stroke-dasharray]="circonference"
+            [attr.stroke-dashoffset]="dashoffset()"
+          />
+        </svg>
+        <div class="matching-ring-value">
+          <span class="matching-percent">{{ displayScore | number: '1.0-0' }}</span>
+          <span class="matching-percent-sign">%</span>
+        </div>
+      </div>
+
+      <p class="matching-status" [ngClass]="couleurClasse()">{{ messageStatut() }}</p>
+
+      @if (phase === 'calculating') {
+        <div class="matching-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <p class="matching-hint">
+          Notre IA lit votre CV et le recoupe avec vos compétences et l'offre...
+        </p>
+      }
+
+      @if (phase === 'done') {
+        @if (resume) {
+          <p class="matching-resume">{{ resume }}</p>
+        }
+
+        @if (matched.length) {
+          <div class="matching-chips">
+            @for (c of matched; track c) {
+              <span class="chip chip-match">✓ {{ c }}</span>
+            }
+          </div>
+        }
+
+        @if (missing.length) {
+          <div class="matching-chips">
+            @for (c of missing; track c) {
+              <span class="chip chip-missing">{{ c }}</span>
+            }
+          </div>
+        }
+
+        <button type="button" class="btn btn-primary matching-cta" (click)="fermer()">
+          Continuer
+        </button>
+      }
+
+      @if (phase === 'error') {
+        <p class="matching-hint">
+          Le score sera de nouveau calculé automatiquement, ou vous pourrez le relancer depuis
+          « Mes candidatures ».
+        </p>
+        <button type="button" class="btn btn-outline matching-cta" (click)="fermer()">Fermer</button>
+      }
+    </div>
+  </div>
+}

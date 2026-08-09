@@ -8,10 +8,11 @@ import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { JobOffer } from '../../../models/job.model';
 import { Application } from '../../../models/application.model';
 import { CandidateProfile } from '../../../models/user.model';
+import { MatchingModal, MatchingModalPhase } from '../../../shared/components/matching-modal/matching-modal';
 
 @Component({
   selector: 'app-job-detail',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, MatchingModal],
   templateUrl: './job-detail.html',
   styleUrl: './job-detail.scss',
 })
@@ -31,6 +32,14 @@ export class JobDetail implements OnInit {
   readonly succes = signal(false);
 
   lettreMotivation = '';
+  lettreMotivationFichier: File | null = null;
+
+  readonly matchOpen = signal(false);
+  readonly matchPhase = signal<MatchingModalPhase>('calculating');
+  readonly matchScore = signal<number | null>(null);
+  readonly matchMatched = signal<string[]>([]);
+  readonly matchMissing = signal<string[]>([]);
+  readonly matchResume = signal<string | null>(null);
 
   readonly dejaPostule = computed(() =>
     this.candidatures().some((c) => c.job_offer_id === this.offre()?.id),
@@ -58,6 +67,10 @@ export class JobDetail implements OnInit {
     });
   }
 
+  surLettreFichierSelectionnee(event: Event): void {
+    this.lettreMotivationFichier = (event.target as HTMLInputElement).files?.[0] ?? null;
+  }
+
   async postuler(): Promise<void> {
     const offre = this.offre();
     if (!offre) return;
@@ -72,9 +85,19 @@ export class JobDetail implements OnInit {
     this.postulation.set(true);
     this.erreur.set('');
 
+    // Ouvre la modal immédiatement : l'animation de calcul couvre le temps réel de l'appel réseau
+    // (le score IA est calculé de façon synchrone côté serveur avant la réponse).
+    this.matchScore.set(null);
+    this.matchMatched.set([]);
+    this.matchMissing.set([]);
+    this.matchResume.set(null);
+    this.matchPhase.set('calculating');
+    this.matchOpen.set(true);
+
     this.applicationService
       .postuler(offre.id, {
         lettre_motivation: this.lettreMotivation || undefined,
+        lettre_motivation_fichier: this.lettreMotivationFichier,
         cv_url: this.profil()?.cv_url ?? undefined,
       })
       .subscribe({
@@ -82,11 +105,27 @@ export class JobDetail implements OnInit {
           this.candidatures.update((c) => [...c, res.candidature]);
           this.postulation.set(false);
           this.succes.set(true);
+
+          const candidature = res.candidature;
+          if (candidature.score_matching_ia !== null) {
+            this.matchScore.set(candidature.score_matching_ia);
+            this.matchMatched.set(candidature.score_detaille?.competences_matchees ?? []);
+            this.matchMissing.set(candidature.score_detaille?.competences_manquantes ?? []);
+            this.matchResume.set(candidature.score_detaille?.resume_ia ?? null);
+            this.matchPhase.set('done');
+          } else {
+            this.matchPhase.set('error');
+          }
         },
         error: (err) => {
           this.erreur.set(err?.error?.message || "Impossible d'envoyer votre candidature.");
           this.postulation.set(false);
+          this.matchOpen.set(false);
         },
       });
+  }
+
+  fermerMatchModal(): void {
+    this.matchOpen.set(false);
   }
 }

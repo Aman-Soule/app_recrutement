@@ -1,0 +1,85 @@
+<app-public-navbar />
+
+<section class="visitor-hero">
+  <div class="visitor-hero__inner">
+    <span class="visitor-hero__eyebrow">Plateforme de recrutement</span>
+    <h1>Trouvez l'offre qui vous correspond</h1>
+    <p>
+      Parcourez librement toutes nos offres actives. Créez un compte quand vous êtes prêt à
+      postuler.
+    </p>
+
+    <div class="visitor-search card">
+      <input
+        type="text"
+        placeholder="Intitulé du poste, mot-clé..."
+        [(ngModel)]="recherche"
+        (keyup.enter)="charger()"
+      />
+      <select [(ngModel)]="typeContrat" (change)="charger()">
+        <option value="">Tous les contrats</option>
+        <option value="temps_plein">Temps plein</option>
+        <option value="temps_partiel">Temps partiel</option>
+        <option value="freelance">Freelance</option>
+        <option value="stage">Stage</option>
+      </select>
+      <select [(ngModel)]="typeLieu" (change)="charger()">
+        <option value="">Tous les lieux</option>
+        <option value="teletravail">Télétravail</option>
+        <option value="hybride">Hybride</option>
+        <option value="presentiel">Présentiel</option>
+      </select>
+      <button class="btn btn-primary" (click)="charger()">Rechercher</button>
+    </div>
+  </div>
+</section>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Offres disponibles</h1>
+      <p>{{ total() }} offre(s) correspondant à votre recherche.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-state">Chargement des offres...</p>
+  } @else {
+    <div class="grid grid-2">
+      @for (offre of offres(); track offre.id) {
+        <div class="card job-row">
+          <div class="job-row__info">
+            <p class="job-row__title">{{ offre.titre }}</p>
+            <p class="job-row__meta">
+              {{ offre.entreprise?.nom }} · {{ offre.localisation || 'Lieu non précisé' }}
+            </p>
+            @if (offre.description) {
+              <p class="job-row__description">{{ offre.description }}</p>
+            }
+          </div>
+          <a class="btn btn-outline" [routerLink]="['/offres', offre.id]"> Voir l'offre </a>
+        </div>
+      } @empty {
+        <p class="empty-state">Aucune offre ne correspond à votre recherche.</p>
+      }
+    </div>
+
+    @if (lastPage() > 1) {
+      <div class="pagination">
+        <button (click)="pagePrecedente()" [disabled]="currentPage() === 1">‹</button>
+        <span>Page {{ currentPage() }} / {{ lastPage() }}</span>
+        <button (click)="pageSuivante()" [disabled]="currentPage() === lastPage()">›</button>
+      </div>
+    }
+  }
+
+  <div class="visitor-cta card">
+    <div>
+      <h2>Prêt à postuler ?</h2>
+      <p class="job-row__meta">
+        Créez votre compte candidat pour postuler en un clic et suivre vos candidatures.
+      </p>
+    </div>
+    <a routerLink="/register" class="btn btn-primary">Créer un compte</a>
+  </div>
+</div>

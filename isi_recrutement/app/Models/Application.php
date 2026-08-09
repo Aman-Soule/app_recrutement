@@ -13,6 +13,7 @@ class Application extends Model
         'score_matching_ia',
         'score_ia_erreur',
         'lettre_motivation',
+        'lettre_motivation_url',
         'cv_url',
         'notes_recruteur',
         'postule_le',

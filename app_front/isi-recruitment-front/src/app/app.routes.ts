@@ -3,6 +3,21 @@ import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
+  // Page d'accueil publique (visiteurs) — nouveau point d'entrée du site
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./pages/public/visitor-home/visitor-home').then((m) => m.VisitorHome),
+  },
+  {
+    path: 'offres/:id',
+    loadComponent: () =>
+      import('./pages/public/visitor-job-detail/visitor-job-detail').then(
+        (m) => m.VisitorJobDetail,
+      ),
+  },
+
   // Pages publiques
   {
     path: 'login',
@@ -225,9 +240,6 @@ export const routes: Routes = [
         path: 'messages',
         loadComponent: () => import('./pages/shared/messages/messages').then((m) => m.Messages),
       },
-
-      // Redirection par défaut (le roleGuard rebascule vers le bon dashboard si besoin)
-      { path: '', redirectTo: '/candidate/dashboard', pathMatch: 'full' },
     ],
   },
 

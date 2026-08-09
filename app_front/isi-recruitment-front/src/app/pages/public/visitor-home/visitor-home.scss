@@ -1,0 +1,137 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--gray-50);
+}
+
+.visitor-hero {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #4f8cff 100%);
+  color: #fff;
+  padding: 64px 32px 96px;
+}
+
+.visitor-hero__inner {
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.visitor-hero__eyebrow {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
+}
+
+.visitor-hero h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.visitor-hero p {
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1rem;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.visitor-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 32px;
+  padding: 16px;
+  text-align: left;
+}
+
+.visitor-search input,
+.visitor-search select {
+  flex: 1;
+  min-width: 160px;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.visitor-search input:focus,
+.visitor-search select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* La liste d'offres remonte visuellement sur le hero, comme un dashboard */
+.page {
+  max-width: 1280px;
+  margin: -56px auto 0;
+  padding: 0 32px 40px;
+  position: relative;
+}
+
+.job-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.job-row__title {
+  font-weight: 700;
+  color: var(--gray-900);
+  font-size: 1rem;
+}
+
+.job-row__meta {
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.job-row__description {
+  color: var(--gray-600);
+  font-size: 0.875rem;
+  margin-top: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.visitor-cta {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+.visitor-cta h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+@media (max-width: 700px) {
+  .visitor-hero {
+    padding: 48px 16px 80px;
+  }
+
+  .visitor-hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .page {
+    padding: 0 16px 32px;
+  }
+}

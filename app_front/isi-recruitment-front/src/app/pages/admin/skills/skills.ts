@@ -24,6 +24,11 @@ export class Skills implements OnInit {
   nouvelleCompetence = '';
   nouvelleCategorie = '';
 
+  readonly editingId = signal<number | null>(null);
+  readonly saving = signal(false);
+  editNom = '';
+  editCategorie = '';
+
   ngOnInit(): void {
     this.charger();
   }
@@ -54,6 +59,38 @@ export class Skills implements OnInit {
       },
       error: (err) => {
         this.creating.set(false);
+        this.errorMessage.set(extractErrorMessage(err));
+      },
+    });
+  }
+
+  commencerEdition(competence: Skill): void {
+    this.editingId.set(competence.id);
+    this.editNom = competence.nom;
+    this.editCategorie = competence.categorie ?? '';
+    this.errorMessage.set(null);
+  }
+
+  annulerEdition(): void {
+    this.editingId.set(null);
+  }
+
+  enregistrer(competence: Skill): void {
+    const nom = this.editNom.trim();
+    if (!nom) return;
+
+    this.saving.set(true);
+    this.errorMessage.set(null);
+    this.skillService.update(competence.id, nom, this.editCategorie.trim() || undefined).subscribe({
+      next: (res) => {
+        this.competences.update((list) =>
+          list.map((c) => (c.id === competence.id ? res.competence : c)),
+        );
+        this.editingId.set(null);
+        this.saving.set(false);
+      },
+      error: (err) => {
+        this.saving.set(false);
         this.errorMessage.set(extractErrorMessage(err));
       },
     });

@@ -16,3 +16,11 @@
   display: flex;
   gap: 10px;
 }
+
+.edit-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  font-size: 0.875rem;
+}

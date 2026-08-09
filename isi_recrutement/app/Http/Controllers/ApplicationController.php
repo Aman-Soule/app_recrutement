@@ -10,6 +10,7 @@ use App\Notifications\ApplicationStatusChanged;
 use App\Notifications\ApplicationSubmitted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
 {
@@ -17,8 +18,9 @@ class ApplicationController extends Controller
     public function store(Request $request, JobOffer $jobOffer)
     {
         $request->validate([
-            'lettre_motivation' => 'nullable|string',
-            'cv_url'            => 'nullable|string',
+            'lettre_motivation'         => 'nullable|string',
+            'lettre_motivation_fichier' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'cv_url'                    => 'nullable|string',
         ]);
 
         $profil = $request->user()->profilCandidat;
@@ -32,13 +34,20 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'Vous avez déjà postulé à cette offre'], 409);
         }
 
+        $lettreMotivationUrl = null;
+        if ($request->hasFile('lettre_motivation_fichier')) {
+            $chemin = $request->file('lettre_motivation_fichier')->store('lettres-motivation', 'public');
+            $lettreMotivationUrl = Storage::disk('public')->url($chemin);
+        }
+
         $candidature = Application::create([
-            'candidate_profile_id' => $profil->id,
-            'job_offer_id'         => $jobOffer->id,
-            'lettre_motivation'    => $request->lettre_motivation,
-            'cv_url'               => $request->cv_url ?? $profil->cv_url,
-            'statut'               => 'nouveau',
-            // score_matching_ia reste null : calculé de façon asynchrone par ScannerCandidatureJob
+            'candidate_profile_id'   => $profil->id,
+            'job_offer_id'           => $jobOffer->id,
+            'lettre_motivation'      => $request->lettre_motivation,
+            'lettre_motivation_url'  => $lettreMotivationUrl,
+            'cv_url'                 => $request->cv_url ?? $profil->cv_url,
+            'statut'                 => 'nouveau',
+            // score_matching_ia est calculé juste après par ScannerCandidatureJob (file d'attente "sync" en local)
         ]);
 
         // Incrémenter le compteur de candidats
@@ -48,9 +57,14 @@ class ApplicationController extends Controller
 
         ScannerCandidatureJob::dispatch($candidature->id);
 
+        // Le job met à jour la ligne en base sur sa propre instance : on recharge la nôtre
+        // pour renvoyer le score au front (utile pour l'animation de matching à la soumission).
+        $candidature->refresh()->load('offre');
+        $this->attacherScoreDetaille($candidature);
+
         return response()->json([
             'message'     => 'Candidature envoyée avec succès',
-            'candidature' => $candidature->load('offre'),
+            'candidature' => $candidature,
         ], 201);
     }
 

@@ -12,11 +12,18 @@ export class ApplicationService {
   /** Candidat : postuler à une offre */
   postuler(
     jobOfferId: number,
-    payload: { lettre_motivation?: string; cv_url?: string } = {},
+    payload: { lettre_motivation?: string; lettre_motivation_fichier?: File | null; cv_url?: string } = {},
   ): Observable<{ message: string; candidature: Application }> {
+    const formData = new FormData();
+    if (payload.lettre_motivation) formData.append('lettre_motivation', payload.lettre_motivation);
+    if (payload.lettre_motivation_fichier) {
+      formData.append('lettre_motivation_fichier', payload.lettre_motivation_fichier);
+    }
+    if (payload.cv_url) formData.append('cv_url', payload.cv_url);
+
     return this.http.post<{ message: string; candidature: Application }>(
       `${API_BASE_URL}/offres/${jobOfferId}/postuler`,
-      payload,
+      formData,
     );
   }
 
