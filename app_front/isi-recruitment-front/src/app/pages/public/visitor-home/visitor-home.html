@@ -44,12 +44,13 @@
 
   @if (loading()) {
     <p class="loading-state">Chargement des offres...</p>
-  } @else if (erreur()) {
+  <!-- } @else if (erreur()) {
     <div class="alert alert-error">
       Impossible de charger les offres pour le moment. Réessayez dans quelques instants.
     </div>
-    <button class="btn btn-outline" (click)="charger(currentPage())">Réessayer</button>
-  } @else {
+    <button class="btn btn-outline" (click)="charger(currentPage())">Réessayer</button> -->
+  } 
+  @else {
     <div class="grid grid-2">
       @for (offre of offres(); track offre.id) {
         <div class="card job-row">
