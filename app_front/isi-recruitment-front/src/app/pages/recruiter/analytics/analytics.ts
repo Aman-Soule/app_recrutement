@@ -12,12 +12,11 @@ import {
 
 const COULEURS_STATUT: Record<StatutCandidature, string> = {
   nouveau: '#94a3b8',
-  preselection: '#a78bfa',
   examen: '#60a5fa',
+  preselection: '#a78bfa',
   entretien: '#2563eb',
-  offre_envoyee: '#16a34a',
-  rejete: '#dc2626',
   embauche: '#0d9488',
+  rejete: '#dc2626',
 };
 
 @Component({

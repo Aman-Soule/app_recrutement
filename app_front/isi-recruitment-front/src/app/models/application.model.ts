@@ -4,12 +4,11 @@ import { Interview } from './interview.model';
 
 export type StatutCandidature =
   | 'nouveau'
-  | 'preselection'
   | 'examen'
+  | 'preselection'
   | 'entretien'
-  | 'offre_envoyee'
-  | 'rejete'
-  | 'embauche';
+  | 'embauche'
+  | 'rejete';
 
 export type SourceScoreIa = 'ia' | 'heuristique';
 
@@ -53,18 +52,17 @@ export interface Application {
 
 export const ETAPES_CANDIDATURE: StatutCandidature[] = [
   'nouveau',
-  'preselection',
   'examen',
+  'preselection',
   'entretien',
-  'offre_envoyee',
+  'embauche',
 ];
 
 export const LIBELLES_STATUT_CANDIDATURE: Record<StatutCandidature, string> = {
   nouveau: 'Nouveau',
-  preselection: 'Présélection',
   examen: 'Examen',
+  preselection: 'Présélection',
   entretien: 'Entretien',
-  offre_envoyee: 'Offre envoyée',
-  rejete: 'Rejeté',
   embauche: 'Embauché',
+  rejete: 'Rejeté',
 };

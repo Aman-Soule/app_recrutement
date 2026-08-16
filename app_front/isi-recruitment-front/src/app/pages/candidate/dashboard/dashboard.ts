@@ -161,18 +161,20 @@ export class Dashboard implements OnInit {
   }
 
   badgeClass(statut: StatutCandidature): string {
-    switch (statut) {
-      case 'embauche':
-        return 'badge-success';
-      case 'rejete':
-        return 'badge-danger';
-      case 'entretien':
-      case 'offre_envoyee':
-        return 'badge-info';
-      default:
-        return 'badge-neutral';
-    }
+  switch (statut) {
+    case 'embauche':
+      return 'badge-success';
+    case 'rejete':
+      return 'badge-danger';
+    case 'entretien':
+      return 'badge-info';
+    case 'preselection':
+    case 'examen':
+      return 'badge-warning';
+    default:
+      return 'badge-neutral';
   }
+}
 
   matchClass(score: number | undefined): string {
     const s = score ?? 0;

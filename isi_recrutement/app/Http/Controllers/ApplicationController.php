@@ -194,7 +194,7 @@ class ApplicationController extends Controller
     public function changerStatut(Request $request, Application $application)
     {
         $request->validate([
-            'statut'          => 'required|in:nouveau,preselection,examen,entretien,offre_envoyee,rejete,embauche',
+            'statut'          => 'required|in:nouveau,examen,preselection,entretien,embauche,rejete',
             'notes_recruteur' => 'nullable|string',
         ]);
 
